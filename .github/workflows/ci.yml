@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # https://docs.astral.sh/uv/guides/integration/github/#installation
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.7.21"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+      
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+      
+      - name: Install dependencies
+        run: uv sync --frozen --all-extras --dev
+      
+      - name: Run tests
+        run: uv run pytest --junitxml=pytest-report.xml
+      
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: pytest-report.xml
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}

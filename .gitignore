@@ -1,0 +1,17 @@
+.env
+.vscode/
+.cursorrules
+.cursor/
+dist/
+build/
+*.egg-info/
+*.whl
+*.pyc
+*.pyo
+*.pyd
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.DS_Store
+.venv/
+
