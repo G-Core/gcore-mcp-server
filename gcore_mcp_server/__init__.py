@@ -1,1 +1,1 @@
-"""MCP GCore Python Server Package."""
+"""MCP Gcore Python Server Package."""
