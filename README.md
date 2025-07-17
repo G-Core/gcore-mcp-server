@@ -31,7 +31,7 @@ Add the server to your Cursor IDE configuration file (`~/.cursor/mcp.json`):
 - `GCORE_API_URL`: "https://api.gcore.com",
 - `GCORE_CLOUD_PROJECT_ID`: "1",
 - `GCORE_CLOUD_REGION_ID`: "76",
-- `GCORE_CLIENT`: "2",
+- `GCORE_CLIENT_ID`: "2",
 
 ## Configuration
 
