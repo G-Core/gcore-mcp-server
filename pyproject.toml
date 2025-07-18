@@ -9,17 +9,12 @@ description = "MCP server for Gcore API"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    {name = "Algis Dumbris", email = "algis.dumbris@gcore.com"},
+    { name = "Algis Dumbris", email = "algis.dumbris@gcore.com" },
 ]
-license = {text = "MIT"}
+license = { text = "MIT" }
 dependencies = [
-    "anyio>=3.6.0",
-    "pydantic>=2.0.0",
-    "uvicorn>=0.17.0",
-    "starlette>=0.19.0",
-    "gcore>=0.3.0,<1.0.0",
-    "fastmcp>=2.9.0",
-    "typing-extensions>=4.5.0",
+    "gcore>=0.5, <1",
+    "fastmcp~=2.9.0",
 ]
 
 [project.optional-dependencies]
@@ -55,7 +50,7 @@ reportMissingImports = true
 
 [tool.pytest]
 testpaths = ["tests"]
-python_files = "test_*.py" 
+python_files = "test_*.py"
 
 [dependency-groups]
 dev = [
