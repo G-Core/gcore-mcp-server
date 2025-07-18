@@ -13,13 +13,8 @@ authors = [
 ]
 license = { text = "Apache-2.0" }
 dependencies = [
-    "anyio>=3.6.0",
-    "pydantic>=2.0.0",
-    "uvicorn>=0.17.0",
-    "starlette>=0.19.0",
-    "gcore>=0.3.0,<1.0.0",
-    "fastmcp>=2.9.0",
-    "typing-extensions>=4.5.0",
+    "gcore>=0.5, <1",
+    "fastmcp~=2.9.0",
 ]
 
 [project.optional-dependencies]
