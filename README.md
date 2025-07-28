@@ -1,4 +1,6 @@
 # Gcore MCP Server
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FG-Core%2Fgcore-mcp-server.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FG-Core%2Fgcore-mcp-server?ref=badge_shield)
+
 
 MCP (Model Context Protocol) server for Gcore API. This server provides tools for interacting with Gcore Cloud API via LLM assistants.
 
@@ -197,3 +199,7 @@ To use it with your local development server:
 2. Run the inspector and connect to your server
 3. Use the web interface to test your tools
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FG-Core%2Fgcore-mcp-server.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FG-Core%2Fgcore-mcp-server?ref=badge_large)
