@@ -92,12 +92,7 @@ class GcoreDomainHandler:
                 '"boot_index": 0, "size": 50}`'
             )
         return base_description
-    
-    @staticmethod
-    def get_json_conversion_parameters() -> Set[str]:
-        """Get parameters that need automatic JSON string conversion."""
-        return {"volumes", "interfaces", "security_groups"}
-    
+
     @staticmethod
     def is_special_parameter(param_name: str) -> bool:
         """Check if a parameter requires special domain handling."""

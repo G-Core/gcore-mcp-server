@@ -98,12 +98,9 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
         # Filter out None values for optional parameters
         filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
-        # Automatic JSON→object conversion for domain-specific parameters
-        domain_handler = get_gcore_domain_handler()
-        json_conversion_params = domain_handler.get_json_conversion_parameters()
-        
-        for key in json_conversion_params:
-            if key in filtered_kwargs and isinstance(filtered_kwargs[key], str):
+        # Automatic JSON str → object conversion
+        for key in filtered_kwargs:
+            if isinstance(filtered_kwargs[key], str):
                 try:
                     filtered_kwargs[key] = json.loads(filtered_kwargs[key])
                 except json.JSONDecodeError:
