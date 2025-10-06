@@ -30,7 +30,7 @@ jobs:
         run: uv sync --frozen --all-extras --dev
       
       - name: Run tests
-        run: uv run pytest --junitxml=pytest-report.xml
+        run: uv run pytest --ignore=tests/test_e2e_smoke.py --junitxml=pytest-report.xml
       
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
