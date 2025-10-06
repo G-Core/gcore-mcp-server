@@ -1,148 +1,214 @@
 """Tests for the schema module."""
 
-from typing import Optional, Union, Literal, Any
-from gcore_mcp_server.core.schema import (
-    convert_param_type_to_schema_type,
-    convert_sdk_type,
-)
-from tests.conftest import MockVolumeSpec
+from typing import Optional, Union, Literal, Any, List, Iterable
+from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
+from gcore import NotGiven, Omit
 
 
-class TestSchemaConversion:
-    """Test suite for type to JSON Schema conversion."""
+class TestNormalizeSDKTypeForMCP:
+    """Test suite for normalize_sdk_type_for_mcp function."""
 
-    def test_basic_types(self):
-        """Test conversion of basic Python types."""
-        # String type
-        result = convert_param_type_to_schema_type(str)
-        assert result["type"] == "string"
-        
-        # Integer type
-        result = convert_param_type_to_schema_type(int)
-        assert result["type"] == "integer"
-        
-        # Boolean type
-        result = convert_param_type_to_schema_type(bool)
-        assert result["type"] == "boolean"
-        
-        # Float type
-        result = convert_param_type_to_schema_type(float)
-        assert result["type"] == "number"
+    def test_union_with_notgiven(self):
+        """Test that Union[T, NotGiven] becomes T | None."""
+        result = normalize_sdk_type_for_mcp(Union[str, NotGiven])
+        # Result should be str | None
+        assert result == (str | None)
 
-    def test_optional_types(self):
-        """Test conversion of Optional types."""
-        result = convert_param_type_to_schema_type(Optional[str])
-        assert result["type"] == "string"
-        assert result["description"] == "Optional"
+    def test_union_with_omit(self):
+        """Test that Union[T, Omit] becomes T | None."""
+        result = normalize_sdk_type_for_mcp(Union[int, Omit])
+        # Result should be int | None
+        assert result == (int | None)
 
-    def test_union_types(self):
-        """Test conversion of Union types."""
-        result = convert_param_type_to_schema_type(Union[str, int])
-        assert "oneOf" in result
-        assert len(result["oneOf"]) == 2
-        
-        # Check that both types are represented
-        types = [schema["type"] for schema in result["oneOf"]]
-        assert "string" in types
-        assert "integer" in types
+    def test_iterable_to_list(self):
+        """Test that Iterable[T] becomes List[T]."""
+        result = normalize_sdk_type_for_mcp(Iterable[int])
+        # Result should be List[int]
+        assert result == List[int]
 
-    def test_literal_types(self):
-        """Test conversion of Literal types."""
-        result = convert_param_type_to_schema_type(Literal["small", "medium", "large"])
-        assert result["type"] == "string"
-        assert "enum" in result
-        assert result["enum"] == ["small", "medium", "large"]
-        assert "Must be one of" in result["description"]
+    def test_union_iterable_with_omit(self):
+        """Test that Union[Iterable[int], Omit] becomes List[int] | None."""
+        result = normalize_sdk_type_for_mcp(Union[Iterable[int], Omit])
+        # Result should be List[int] | None
+        assert result == (List[int] | None)
 
-    def test_list_types(self):
-        """Test conversion of List types."""
-        result = convert_param_type_to_schema_type(list[str])
-        assert result["type"] == "array"
-        assert result["items"]["type"] == "string"
-        assert "Array of" in result["description"]
+    def test_complex_union_with_sdk_markers(self):
+        """Test Union[str, int, NotGiven] becomes Union[str, int] | None."""
+        result = normalize_sdk_type_for_mcp(Union[str, int, NotGiven])
+        # Should be Union[str, int] | None
+        from typing import get_origin, get_args
+        assert get_origin(result) is Union
+        args = get_args(result)
+        # Should have Union[str, int] and None
+        assert type(None) in args
 
-    def test_dict_types(self):
-        """Test conversion of Dict types."""
-        result = convert_param_type_to_schema_type(dict[str, int])
-        assert result["type"] == "object"
-        assert "additionalProperties" in result
-        assert result["additionalProperties"]["type"] == "integer"
+    def test_simple_type_passthrough(self):
+        """Test that simple types pass through unchanged."""
+        assert normalize_sdk_type_for_mcp(str) is str
+        assert normalize_sdk_type_for_mcp(int) is int
+        assert normalize_sdk_type_for_mcp(bool) is bool
 
-    def test_typeddict_conversion(self):
-        """Test conversion of TypedDict to JSON Schema."""
-        result = convert_param_type_to_schema_type(MockVolumeSpec)
-        assert result["type"] == "object"
-        assert "properties" in result
-        assert "source" in result["properties"]
-        assert "size" in result["properties"]
-        
-        # Check required fields
-        assert "required" in result
-        assert "source" in result["required"]
+    def test_optional_type_preserved(self):
+        """Test that Optional[T] is preserved."""
+        result = normalize_sdk_type_for_mcp(Optional[str])
+        assert result == Optional[str]
 
-    def test_any_type(self):
-        """Test conversion of Any type."""
-        result = convert_param_type_to_schema_type(Any)
-        assert result["type"] == "object"
-        assert "Any type" in result["description"]
+    def test_literal_type_preserved(self):
+        """Test that Literal types pass through unchanged."""
+        literal_type = Literal["a", "b", "c"]
+        assert normalize_sdk_type_for_mcp(literal_type) == literal_type
 
-    def test_volumes_parameter_special_handling(self):
-        """Test special handling for 'volumes' parameter."""
-        result = convert_param_type_to_schema_type(list[MockVolumeSpec], "volumes")
-        assert result["type"] == "array"
-        assert "examples" in result
-        assert len(result["examples"]) == 2
-        assert "List of volume configurations" in result["description"]
+    def test_list_type_preserved(self):
+        """Test that List[T] passes through (may be normalized to list[T])."""
+        from typing import get_origin, get_args
+        list_type = List[str]
+        result = normalize_sdk_type_for_mcp(list_type)
+        # Should be a list type with str items
+        assert get_origin(result) is list
+        assert get_args(result) == (str,)
 
-    def test_interfaces_parameter_special_handling(self):
-        """Test special handling for 'interfaces' parameter."""
-        from tests.conftest import MockNetworkInterface
-        result = convert_param_type_to_schema_type(list[MockNetworkInterface], "interfaces")
-        assert result["type"] == "array"
-        assert "examples" in result
-        assert "List of network interface configurations" in result["description"]
+    def test_empty_union_with_sdk_markers(self):
+        """Test Union with only SDK markers becomes Any | None."""
+        result = normalize_sdk_type_for_mcp(Union[NotGiven, Omit])
+        assert result == (Any | None)
 
-    def test_security_groups_parameter_special_handling(self):
-        """Test special handling for 'security_groups' parameter."""
-        result = convert_param_type_to_schema_type(list[str], "security_groups")
-        assert result["type"] == "array"
-        assert "examples" in result
-        assert "List of security group UUIDs" in result["description"]
+    def test_io_type_normalized(self):
+        """Test that IO[bytes] is normalized to str."""
+        from typing import IO
+        result = normalize_sdk_type_for_mcp(IO[bytes])
+        assert result is str
 
-    def test_convert_sdk_type_with_notgiven(self):
-        """Test convert_sdk_type handles NotGiven correctly."""
-        from gcore import NotGiven
-        
-        # Test Union[str, NotGiven] -> Optional[str]
-        union_type = Union[str, NotGiven]
-        result = convert_sdk_type(union_type)
-        # The result should be Optional[str] which is Union[str, None]
-        assert result is not None
+    def test_pathlike_normalized(self):
+        """Test that os.PathLike is normalized to str."""
+        import os
+        result = normalize_sdk_type_for_mcp(os.PathLike)
+        assert result is str
 
-    def test_fallback_for_unknown_types(self):
-        """Test that unknown types get a fallback schema."""
-        class CustomClass:
+    def test_union_with_io_normalized(self):
+        """Test that Union[IO[bytes], bytes] is normalized properly."""
+        from typing import IO, Union as TypingUnion
+        result = normalize_sdk_type_for_mcp(TypingUnion[IO[bytes], bytes])
+        # Should normalize IO[bytes] to str, keep bytes
+        from typing import get_origin, get_args
+        assert get_origin(result) is TypingUnion
+        args = get_args(result)
+        assert str in args
+        assert bytes in args
+
+
+class TestE2ESchemaGeneration:
+    """E2E tests for actual schema generation through FastMCP."""
+
+    def test_basic_types_schema_generation(self):
+        """Test that basic types generate correct schemas through FastMCP."""
+        from fastmcp.tools.tool import Tool
+        from typing import Any
+
+        async def test_func(
+            str_param: str,
+            int_param: int,
+            bool_param: bool,
+            optional_param: str | None = None,
+        ) -> Any:
+            """Test function."""
             pass
-        
-        result = convert_param_type_to_schema_type(CustomClass)
-        assert result["type"] == "object"
-        assert "CustomClass" in result["description"]
 
-    def test_parameter_name_context(self):
-        """Test that parameter names influence schema generation."""
-        # Test volumes parameter
-        result = convert_param_type_to_schema_type(list[dict[str, Any]], "volumes")
-        assert "volume" in result["description"].lower()
-        
-        # Test regular parameter
-        result = convert_param_type_to_schema_type(list[dict[str, Any]], "items")
-        assert "Array of" in result["description"]
+        tool = Tool.from_function(test_func, name="test", description="Test")
+        schema = tool.to_mcp_tool().model_dump()
+        props = schema["inputSchema"]["properties"]
 
-    def test_nested_optional_union_types(self):
-        """Test complex nested types with Optional and Union."""
-        complex_type = Optional[Union[str, list[int]]]
-        result = convert_param_type_to_schema_type(complex_type)
-        
-        assert "oneOf" in result
-        # Should have string, array, and null types
-        assert len(result["oneOf"]) == 3 
+        # Verify basic types
+        assert props["str_param"]["type"] == "string"
+        assert props["int_param"]["type"] == "integer"
+        assert props["bool_param"]["type"] == "boolean"
+
+        # Verify optional
+        assert "anyOf" in props["optional_param"]
+
+    def test_array_schema_generation(self):
+        """Test that list types generate correct array schemas."""
+        from fastmcp.tools.tool import Tool
+        from typing import Any, List
+
+        async def test_func(items: List[str]) -> Any:
+            """Test function."""
+            pass
+
+        tool = Tool.from_function(test_func, name="test", description="Test")
+        schema = tool.to_mcp_tool().model_dump()
+        props = schema["inputSchema"]["properties"]
+
+        assert props["items"]["type"] == "array"
+        assert props["items"]["items"]["type"] == "string"
+
+    def test_union_schema_generation(self):
+        """Test that Union types generate correct schemas."""
+        from fastmcp.tools.tool import Tool
+        from typing import Any, Union
+
+        async def test_func(param: Union[str, int]) -> Any:
+            """Test function."""
+            pass
+
+        tool = Tool.from_function(test_func, name="test", description="Test")
+        schema = tool.to_mcp_tool().model_dump()
+        props = schema["inputSchema"]["properties"]
+
+        assert "anyOf" in props["param"]
+
+    def test_literal_schema_generation(self):
+        """Test that Literal types generate correct enum schemas."""
+        from fastmcp.tools.tool import Tool
+        from typing import Any, Literal
+
+        async def test_func(size: Literal["small", "medium", "large"]) -> Any:
+            """Test function."""
+            pass
+
+        tool = Tool.from_function(test_func, name="test", description="Test")
+        schema = tool.to_mcp_tool().model_dump()
+        props = schema["inputSchema"]["properties"]
+
+        assert props["size"]["enum"] == ["small", "medium", "large"]
+
+    def test_wrapper_with_sdk_types_generates_correct_schema(self):
+        """Test that wrapper with SDK types generates correct schema."""
+        from gcore_mcp_server.server import make_wrapper
+        from fastmcp.tools.tool import Tool
+        from typing import Union, List
+        from gcore import Omit
+
+        # Mock SDK method with SDK types
+        def mock_sdk_method(
+            projects: Union[List[int], Omit] = Omit(),
+            name: Union[str, Omit] = Omit(),
+        ) -> dict:
+            """Mock SDK method."""
+            return {}
+
+        # Add type hints
+        mock_sdk_method.__annotations__ = {
+            "projects": Union[List[int], Omit],
+            "name": Union[str, Omit],
+            "return": dict,
+        }
+
+        # Create wrapper
+        wrapper = make_wrapper(mock_sdk_method, "test.mock")
+
+        # Create FastMCP tool
+        tool = Tool.from_function(wrapper, name="test", description="Test")
+        schema = tool.to_mcp_tool().model_dump()
+        props = schema["inputSchema"]["properties"]
+
+        # Verify SDK types are normalized
+        # projects: Union[List[int], Omit] → List[int] | None
+        assert "anyOf" in props["projects"]
+        array_types = [s for s in props["projects"]["anyOf"] if s.get("type") == "array"]
+        assert len(array_types) == 1
+        assert array_types[0]["items"]["type"] == "integer"
+
+        # name: Union[str, Omit] → str | None
+        assert "anyOf" in props["name"]
+        string_types = [s for s in props["name"]["anyOf"] if s.get("type") == "string"]
+        assert len(string_types) == 1

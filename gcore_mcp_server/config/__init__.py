@@ -19,7 +19,7 @@ from .toolsets import (
 
 __all__ = [
     "UNIFIED_TOOLS_ENV_VAR",
-    "MAX_TOOL_NAME_LEN", 
+    "MAX_TOOL_NAME_LEN",
     "generate_short_tool_name",
     "get_shortening_rules",
     "get_unified_tool_config",
@@ -30,4 +30,4 @@ __all__ = [
     "get_active_toolset_names",
     "get_allowed_tools_list",
     "derive_allowed_resources",
-] 
+]

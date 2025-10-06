@@ -11,8 +11,9 @@ from enum import Enum
 
 class GcoreParameterType(Enum):
     """Types of special Gcore parameters that need custom handling."""
+
     VOLUMES = "volumes"
-    INTERFACES = "interfaces" 
+    INTERFACES = "interfaces"
     SECURITY_GROUPS = "security_groups"
     FLAVORS = "flavors"
     NETWORKS = "networks"
@@ -24,11 +25,11 @@ class GcoreParameterType(Enum):
 # Domain-specific parameter names that require special handling
 GCORE_SPECIAL_PARAMETERS: Set[str] = {
     "volumes",
-    "interfaces", 
+    "interfaces",
     "security_groups",
     "flavors",
     "networks",
-    "instances", 
+    "instances",
     "projects",
     "regions",
 }
@@ -36,7 +37,7 @@ GCORE_SPECIAL_PARAMETERS: Set[str] = {
 
 class GcoreDomainHandler:
     """Handler for Gcore SDK domain-specific logic."""
-    
+
     @staticmethod
     def get_parameter_description(param_name: str, base_description: str = "") -> str:
         """Get domain-specific parameter descriptions."""
@@ -53,56 +54,63 @@ class GcoreDomainHandler:
                 'Example: `[{"type": "external", "network_id": "..."}]`'
             ),
             "security_groups": (
-                "List of security group UUIDs. "
-                'Example: `["<sg_uuid1>", "<sg_uuid2>"]`'
+                'List of security group UUIDs. Example: `["<sg_uuid1>", "<sg_uuid2>"]`'
             ),
         }
-        
+
         if param_name in descriptions:
             return descriptions[param_name]
-        
+
         return base_description
-    
+
     @staticmethod
     def get_parameter_examples(param_name: str) -> List[Any]:
         """Get domain-specific parameter examples."""
         examples = {
             "volumes": [
-                [{"source": "image", "image_id": "<image_uuid>", "boot_index": 0, "size": 50}],
-                [{"id": "<existing_volume_uuid>"}]
+                [
+                    {
+                        "source": "image",
+                        "image_id": "<image_uuid>",
+                        "boot_index": 0,
+                        "size": 50,
+                    }
+                ],
+                [{"id": "<existing_volume_uuid>"}],
             ],
             "interfaces": [
                 [{"type": "external", "network_id": "<network_uuid>"}],
-                [{"type": "internal", "subnet_id": "<subnet_uuid>", "security_groups": ["<sg_uuid>"]}]
+                [
+                    {
+                        "type": "internal",
+                        "subnet_id": "<subnet_uuid>",
+                        "security_groups": ["<sg_uuid>"],
+                    }
+                ],
             ],
-            "security_groups": [
-                ["<sg_uuid1>", "<sg_uuid2>"]
-            ],
+            "security_groups": [["<sg_uuid1>", "<sg_uuid2>"]],
         }
-        
+
         return examples.get(param_name, [])
-    
+
     @staticmethod
-    def get_union_type_description_enhancement(param_name: str, base_description: str) -> str:
+    def get_union_type_description_enhancement(
+        param_name: str, base_description: str
+    ) -> str:
         """Enhance union type descriptions with domain-specific examples."""
         if param_name == "volumes":
             return (
-                base_description + 
-                '. Example for a boot volume: `{"source": "image", "image_id": "...", '
+                base_description
+                + '. Example for a boot volume: `{"source": "image", "image_id": "...", '
                 '"boot_index": 0, "size": 50}`'
             )
         return base_description
-    
-    @staticmethod
-    def get_json_conversion_parameters() -> Set[str]:
-        """Get parameters that need automatic JSON string conversion."""
-        return {"volumes", "interfaces", "security_groups"}
-    
+
     @staticmethod
     def is_special_parameter(param_name: str) -> bool:
         """Check if a parameter requires special domain handling."""
         return param_name in GCORE_SPECIAL_PARAMETERS
-    
+
     @staticmethod
     def get_resource_shortening_rules() -> Dict[str, str]:
         """Get resource name shortening rules for tool names."""
@@ -142,8 +150,9 @@ class GcoreDomainHandler:
             "ai_clusters": "ai_clstrs",
             "inference": "infer",
             "deployments": "deploys",
+            "cost_reports": "cost_rpts",
         }
-    
+
     @staticmethod
     def get_method_shortening_rules() -> Dict[str, str]:
         """Get method name shortening rules for tool names."""
@@ -154,7 +163,6 @@ class GcoreDomainHandler:
             "list": "ls",
             "update": "upd",
             "replace": "repl",
-            
             # Instance operations
             "assign_security_group": "assign_secgrp",
             "unassign_security_group": "unassign_secgrp",
@@ -168,7 +176,6 @@ class GcoreDomainHandler:
             "create_from_volume": "new_vol",
             "upload": "upload",
             "download": "download",
-            
             # Volume operations
             "change_type": "chg_type",
             "revert_to_last_snapshot": "revert_snap",
@@ -178,22 +185,18 @@ class GcoreDomainHandler:
             "create_snapshot": "snap",
             "revert": "revert",
             "get_capacity_by_region": "get_cap_region",
-            
             # Network operations
             "attach_subnet": "att_sub",
             "detach_subnet": "det_sub",
             "attach_router": "att_rtr",
             "detach_router": "det_rtr",
-            
             # Load balancer operations
             "add_member": "add_mbr",
             "remove_member": "rm_mbr",
             "failover": "failover",
-            
             # Security operations
             "copy": "copy",
             "revert_to_default": "revert_def",
-            
             # GPU operations
             "hard_reboot": "hard_reboot",
             "soft_reboot": "soft_reboot",
@@ -202,148 +205,246 @@ class GcoreDomainHandler:
             "suspend": "suspend",
             "resume": "resume",
             "rebuild": "rebuild",
+            # Cost reports methods
+            "get_aggregated": "get_agg",
+            "get_aggregated_monthly": "get_agg_mon",
+            "get_detailed": "get_det",
         }
-    
+
     @staticmethod
     def get_toolset_definitions() -> Dict[str, List[str]]:
         """Get Gcore-specific toolset definitions."""
         return {
             "instances": [
                 # Instances
-                "cloud.instances.create", "cloud.instances.list", "cloud.instances.get", 
-                "cloud.instances.update", "cloud.instances.delete",
-                "cloud.instances.assign_security_group", "cloud.instances.unassign_security_group", 
-                "cloud.instances.resize", "cloud.instances.get_console",
-                "cloud.instances.add_to_placement_group", "cloud.instances.remove_from_placement_group", 
-                "cloud.instances.disable_port_security", "cloud.instances.enable_port_security", 
+                "cloud.instances.create",
+                "cloud.instances.list",
+                "cloud.instances.get",
+                "cloud.instances.update",
+                "cloud.instances.delete",
+                "cloud.instances.assign_security_group",
+                "cloud.instances.unassign_security_group",
+                "cloud.instances.resize",
+                "cloud.instances.get_console",
+                "cloud.instances.add_to_placement_group",
+                "cloud.instances.remove_from_placement_group",
+                "cloud.instances.disable_port_security",
+                "cloud.instances.enable_port_security",
                 "cloud.instances.action",
-                "cloud.instances.flavors.list", "cloud.instances.flavors.list_suitable", 
+                "cloud.instances.flavors.list",
+                "cloud.instances.flavors.list_suitable",
                 "cloud.instances.flavors.list_for_resize",
-                "cloud.instances.interfaces.list", "cloud.instances.interfaces.attach", 
+                "cloud.instances.interfaces.list",
+                "cloud.instances.interfaces.attach",
                 "cloud.instances.interfaces.detach",
-                "cloud.instances.images.create_from_volume", "cloud.instances.images.list", 
-                "cloud.instances.images.get", "cloud.instances.images.update",
-                "cloud.instances.images.delete", "cloud.instances.images.upload",
+                "cloud.instances.images.create_from_volume",
+                "cloud.instances.images.list",
+                "cloud.instances.images.get",
+                "cloud.instances.images.update",
+                "cloud.instances.images.delete",
+                "cloud.instances.images.upload",
                 "cloud.instances.metrics.list",
             ],
             "baremetal": [
                 # Bare Metal
-                "cloud.baremetal.create", "cloud.baremetal.list", "cloud.baremetal.get", 
-                "cloud.baremetal.update", "cloud.baremetal.delete",
-                "cloud.baremetal.action", "cloud.baremetal.resize", "cloud.baremetal.get_console",
-                "cloud.baremetal.assign_security_group", "cloud.baremetal.unassign_security_group",
-                "cloud.baremetal.add_to_placement_group", "cloud.baremetal.remove_from_placement_group",
-                "cloud.baremetal.disable_port_security", "cloud.baremetal.enable_port_security",
-                "cloud.baremetal.flavors.list", "cloud.baremetal.flavors.list_suitable",
-                "cloud.baremetal.interfaces.list", "cloud.baremetal.interfaces.attach", 
+                "cloud.baremetal.create",
+                "cloud.baremetal.list",
+                "cloud.baremetal.get",
+                "cloud.baremetal.update",
+                "cloud.baremetal.delete",
+                "cloud.baremetal.action",
+                "cloud.baremetal.resize",
+                "cloud.baremetal.get_console",
+                "cloud.baremetal.assign_security_group",
+                "cloud.baremetal.unassign_security_group",
+                "cloud.baremetal.add_to_placement_group",
+                "cloud.baremetal.remove_from_placement_group",
+                "cloud.baremetal.disable_port_security",
+                "cloud.baremetal.enable_port_security",
+                "cloud.baremetal.flavors.list",
+                "cloud.baremetal.flavors.list_suitable",
+                "cloud.baremetal.interfaces.list",
+                "cloud.baremetal.interfaces.attach",
                 "cloud.baremetal.interfaces.detach",
                 "cloud.baremetal.metrics.list",
             ],
             "gpu": [
                 # GPU Clusters
-                "cloud.gpu_baremetal_clusters.create", "cloud.gpu_baremetal_clusters.list", 
-                "cloud.gpu_baremetal_clusters.get", "cloud.gpu_baremetal_clusters.update", 
+                "cloud.gpu_baremetal_clusters.create",
+                "cloud.gpu_baremetal_clusters.list",
+                "cloud.gpu_baremetal_clusters.get",
+                "cloud.gpu_baremetal_clusters.update",
                 "cloud.gpu_baremetal_clusters.delete",
                 "cloud.gpu_baremetal_clusters.flavors.list",
-                "cloud.gpu_baremetal_clusters.servers.create", "cloud.gpu_baremetal_clusters.servers.list", 
-                "cloud.gpu_baremetal_clusters.servers.get", "cloud.gpu_baremetal_clusters.servers.delete",
-                "cloud.gpu_baremetal_clusters.images.list", "cloud.gpu_baremetal_clusters.images.get", 
-                "cloud.gpu_baremetal_clusters.images.update", "cloud.gpu_baremetal_clusters.images.delete",
+                "cloud.gpu_baremetal_clusters.servers.create",
+                "cloud.gpu_baremetal_clusters.servers.list",
+                "cloud.gpu_baremetal_clusters.servers.get",
+                "cloud.gpu_baremetal_clusters.servers.delete",
+                "cloud.gpu_baremetal_clusters.images.list",
+                "cloud.gpu_baremetal_clusters.images.get",
+                "cloud.gpu_baremetal_clusters.images.update",
+                "cloud.gpu_baremetal_clusters.images.delete",
             ],
             "networking": [
                 # Networks
-                "cloud.networks.create", "cloud.networks.list", "cloud.networks.get", 
-                "cloud.networks.update", "cloud.networks.delete",
-                "cloud.networks.subnets.create", "cloud.networks.subnets.list", 
-                "cloud.networks.subnets.get", "cloud.networks.subnets.update", 
+                "cloud.networks.create",
+                "cloud.networks.list",
+                "cloud.networks.get",
+                "cloud.networks.update",
+                "cloud.networks.delete",
+                "cloud.networks.subnets.create",
+                "cloud.networks.subnets.list",
+                "cloud.networks.subnets.get",
+                "cloud.networks.subnets.update",
                 "cloud.networks.subnets.delete",
-                "cloud.networks.routers.create", "cloud.networks.routers.list", 
-                "cloud.networks.routers.get", "cloud.networks.routers.update", 
+                "cloud.networks.routers.create",
+                "cloud.networks.routers.list",
+                "cloud.networks.routers.get",
+                "cloud.networks.routers.update",
                 "cloud.networks.routers.delete",
-                "cloud.networks.routers.attach_subnet", "cloud.networks.routers.detach_subnet",
+                "cloud.networks.routers.attach_subnet",
+                "cloud.networks.routers.detach_subnet",
                 # Floating IPs
-                "cloud.floating_ips.create", "cloud.floating_ips.list", "cloud.floating_ips.get", 
-                "cloud.floating_ips.update", "cloud.floating_ips.delete",
+                "cloud.floating_ips.create",
+                "cloud.floating_ips.list",
+                "cloud.floating_ips.get",
+                "cloud.floating_ips.update",
+                "cloud.floating_ips.delete",
                 # Reserved Fixed IPs
-                "cloud.reserved_fixed_ips.create", "cloud.reserved_fixed_ips.list", 
-                "cloud.reserved_fixed_ips.get", "cloud.reserved_fixed_ips.update", 
+                "cloud.reserved_fixed_ips.create",
+                "cloud.reserved_fixed_ips.list",
+                "cloud.reserved_fixed_ips.get",
+                "cloud.reserved_fixed_ips.update",
                 "cloud.reserved_fixed_ips.delete",
                 # Load Balancers
-                "cloud.load_balancers.create", "cloud.load_balancers.list", "cloud.load_balancers.get", 
-                "cloud.load_balancers.update", "cloud.load_balancers.delete",
+                "cloud.load_balancers.create",
+                "cloud.load_balancers.list",
+                "cloud.load_balancers.get",
+                "cloud.load_balancers.update",
+                "cloud.load_balancers.delete",
                 "cloud.load_balancers.flavors.list",
                 # Listeners
-                "cloud.load_balancers.listeners.create", "cloud.load_balancers.listeners.list", 
-                "cloud.load_balancers.listeners.get", "cloud.load_balancers.listeners.update", 
+                "cloud.load_balancers.listeners.create",
+                "cloud.load_balancers.listeners.list",
+                "cloud.load_balancers.listeners.get",
+                "cloud.load_balancers.listeners.update",
                 "cloud.load_balancers.listeners.delete",
                 # Pools
-                "cloud.load_balancers.pools.create", "cloud.load_balancers.pools.list", 
-                "cloud.load_balancers.pools.get", "cloud.load_balancers.pools.update", 
+                "cloud.load_balancers.pools.create",
+                "cloud.load_balancers.pools.list",
+                "cloud.load_balancers.pools.get",
+                "cloud.load_balancers.pools.update",
                 "cloud.load_balancers.pools.delete",
                 # L7 Policies
-                "cloud.load_balancers.l7policies.create", "cloud.load_balancers.l7policies.list", 
-                "cloud.load_balancers.l7policies.get", "cloud.load_balancers.l7policies.update", 
+                "cloud.load_balancers.l7policies.create",
+                "cloud.load_balancers.l7policies.list",
+                "cloud.load_balancers.l7policies.get",
+                "cloud.load_balancers.l7policies.update",
                 "cloud.load_balancers.l7policies.delete",
             ],
             "security": [
                 # Security Groups
-                "cloud.security_groups.create", "cloud.security_groups.list", 
-                "cloud.security_groups.get", "cloud.security_groups.update", 
+                "cloud.security_groups.create",
+                "cloud.security_groups.list",
+                "cloud.security_groups.get",
+                "cloud.security_groups.update",
                 "cloud.security_groups.delete",
-                "cloud.security_groups.copy", "cloud.security_groups.revert_to_default",
-                "cloud.security_groups.rules.create", "cloud.security_groups.rules.replace", 
+                "cloud.security_groups.copy",
+                "cloud.security_groups.revert_to_default",
+                "cloud.security_groups.rules.create",
+                "cloud.security_groups.rules.replace",
                 "cloud.security_groups.rules.delete",
                 # SSH Keys
-                "cloud.ssh_keys.create", "cloud.ssh_keys.list", "cloud.ssh_keys.get", 
-                "cloud.ssh_keys.update", "cloud.ssh_keys.delete",
+                "cloud.ssh_keys.create",
+                "cloud.ssh_keys.list",
+                "cloud.ssh_keys.get",
+                "cloud.ssh_keys.update",
+                "cloud.ssh_keys.delete",
                 # Secrets
-                "cloud.secrets.create", "cloud.secrets.list", "cloud.secrets.get", 
-                "cloud.secrets.update", "cloud.secrets.delete",
+                "cloud.secrets.create",
+                "cloud.secrets.list",
+                "cloud.secrets.get",
+                "cloud.secrets.update",
+                "cloud.secrets.delete",
             ],
             "storage": [
                 # Volumes
-                "cloud.volumes.create", "cloud.volumes.list", "cloud.volumes.get", 
-                "cloud.volumes.update", "cloud.volumes.delete",
-                "cloud.volumes.resize", "cloud.volumes.change_type", 
+                "cloud.volumes.create",
+                "cloud.volumes.list",
+                "cloud.volumes.get",
+                "cloud.volumes.update",
+                "cloud.volumes.delete",
+                "cloud.volumes.resize",
+                "cloud.volumes.change_type",
                 "cloud.volumes.revert_to_last_snapshot",
-                "cloud.volumes.attach_to_instance", "cloud.volumes.detach_from_instance",
-                "cloud.volumes.snapshots.create", "cloud.volumes.snapshots.list", 
-                "cloud.volumes.snapshots.get", "cloud.volumes.snapshots.update", 
+                "cloud.volumes.attach_to_instance",
+                "cloud.volumes.detach_from_instance",
+                "cloud.volumes.snapshots.create",
+                "cloud.volumes.snapshots.list",
+                "cloud.volumes.snapshots.get",
+                "cloud.volumes.snapshots.update",
                 "cloud.volumes.snapshots.delete",
                 # File Shares
-                "cloud.file_shares.create", "cloud.file_shares.list", "cloud.file_shares.get", 
-                "cloud.file_shares.update", "cloud.file_shares.delete",
-                "cloud.file_shares.extend", "cloud.file_shares.get_capacity_by_region",
+                "cloud.file_shares.create",
+                "cloud.file_shares.list",
+                "cloud.file_shares.get",
+                "cloud.file_shares.update",
+                "cloud.file_shares.delete",
+                "cloud.file_shares.extend",
+                "cloud.file_shares.get_capacity_by_region",
             ],
             "management": [
                 # Projects
-                "cloud.projects.create", "cloud.projects.list", "cloud.projects.get", 
-                "cloud.projects.update", "cloud.projects.delete",
+                "cloud.projects.create",
+                "cloud.projects.list",
+                "cloud.projects.get",
+                "cloud.projects.update",
+                "cloud.projects.delete",
                 # Regions
-                "cloud.regions.list", "cloud.regions.get",
+                "cloud.regions.list",
+                "cloud.regions.get",
                 # Placement Groups
-                "cloud.placement_groups.create", "cloud.placement_groups.list", 
-                "cloud.placement_groups.get", "cloud.placement_groups.update", 
+                "cloud.placement_groups.create",
+                "cloud.placement_groups.list",
+                "cloud.placement_groups.get",
+                "cloud.placement_groups.update",
                 "cloud.placement_groups.delete",
                 # Tasks
-                "cloud.tasks.list", "cloud.tasks.get", "cloud.tasks.acknowledge_all", 
+                "cloud.tasks.list",
+                "cloud.tasks.get",
+                "cloud.tasks.acknowledge_all",
                 "cloud.tasks.acknowledge_one",
                 # Quotas
-                "cloud.quotas.list", "cloud.quotas.get",
+                "cloud.quotas.list",
+                "cloud.quotas.get",
             ],
             "ai": [
                 # AI Clusters
-                "cloud.ai_clusters.create", "cloud.ai_clusters.list", "cloud.ai_clusters.get", 
-                "cloud.ai_clusters.update", "cloud.ai_clusters.delete",
+                "cloud.ai_clusters.create",
+                "cloud.ai_clusters.list",
+                "cloud.ai_clusters.get",
+                "cloud.ai_clusters.update",
+                "cloud.ai_clusters.delete",
                 # Inference
-                "cloud.inference.deployments.create", "cloud.inference.deployments.list", 
-                "cloud.inference.deployments.get", "cloud.inference.deployments.update", 
+                "cloud.inference.deployments.create",
+                "cloud.inference.deployments.list",
+                "cloud.inference.deployments.get",
+                "cloud.inference.deployments.update",
                 "cloud.inference.deployments.delete",
             ],
             "containers": [
                 # Registries
-                "cloud.registries.create", "cloud.registries.list", "cloud.registries.get", 
-                "cloud.registries.update", "cloud.registries.delete",
+                "cloud.registries.create",
+                "cloud.registries.list",
+                "cloud.registries.get",
+                "cloud.registries.update",
+                "cloud.registries.delete",
+            ],
+            "billing": [
+                # Cost Reports
+                "cloud.cost_reports.get_aggregated",
+                "cloud.cost_reports.get_aggregated_monthly",
+                "cloud.cost_reports.get_detailed",
             ],
         }
 
@@ -354,4 +455,4 @@ _gcore_domain_handler = GcoreDomainHandler()
 
 def get_gcore_domain_handler() -> GcoreDomainHandler:
     """Get the global Gcore domain handler instance."""
-    return _gcore_domain_handler 
+    return _gcore_domain_handler

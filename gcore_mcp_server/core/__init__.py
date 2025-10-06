@@ -7,19 +7,13 @@ from .inspection import (
     clear_inspection_cache,
     ResourceMethodsDict,
 )
-from .schema import (
-    convert_param_type_to_schema_type,
-    convert_sdk_type,
-    SDKBaseModel,
-)
+from .schema import normalize_sdk_type_for_mcp
 
 __all__ = [
     "inspect_sdk_methods",
-    "iter_sdk_methods", 
+    "iter_sdk_methods",
     "get_all_resources",
     "clear_inspection_cache",
     "ResourceMethodsDict",
-    "convert_param_type_to_schema_type",
-    "convert_sdk_type",
-    "SDKBaseModel",
-] 
+    "normalize_sdk_type_for_mcp",
+]

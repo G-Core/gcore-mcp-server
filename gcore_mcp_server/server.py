@@ -28,14 +28,15 @@ from typing import Any, Callable
 from functools import wraps
 from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7.1
 from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
+from typing import get_type_hints
 from gcore import Gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
+from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import (
     UNIFIED_TOOLS_ENV_VAR,
     generate_short_tool_name,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
-from gcore_mcp_server.domain import get_gcore_domain_handler
 
 logger = logging.getLogger("gcore-mcp")
 logging.basicConfig(level="INFO", format="%(levelname)s | %(message)s")
@@ -89,7 +90,8 @@ def _serialize_result(result: Any) -> Any:  # noqa: ANN401
 
 
 def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., Any]:
-    """Create an **async** function that proxies to *method* keeping its signature."""
+    """Create an async wrapper that preserves SDK type information for FastMCP."""
+    from gcore import NotGiven, Omit
 
     sig = inspect.signature(method)
 
@@ -98,16 +100,14 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
         # Filter out None values for optional parameters
         filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
-        # Automatic JSON→object conversion for domain-specific parameters
-        domain_handler = get_gcore_domain_handler()
-        json_conversion_params = domain_handler.get_json_conversion_parameters()
-        
-        for key in json_conversion_params:
-            if key in filtered_kwargs and isinstance(filtered_kwargs[key], str):
+        # Backward compatibility: JSON string → object conversion
+        # This allows clients to still pass JSON strings if needed
+        for key in filtered_kwargs:
+            if isinstance(filtered_kwargs[key], str):
                 try:
                     filtered_kwargs[key] = json.loads(filtered_kwargs[key])
                 except json.JSONDecodeError:
-                    logger.warning("Could not JSON-decode %s for %s", key, full_name)
+                    pass  # Keep as string if not valid JSON
 
         result = method(**filtered_kwargs)
         if inspect.isawaitable(result):
@@ -116,20 +116,61 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
         # Serialize the result to ensure JSON compatibility
         return _serialize_result(result)
 
-    # Create proper annotations for FastMCP based on original signature
-    simple_annotations: dict[str, Any] = {}
-    for param_name, param in sig.parameters.items():
-        # Check if parameter has a default value (making it optional)
-        if param.default is not inspect.Parameter.empty:
-            # Optional parameter - allow str or None
-            simple_annotations[param_name] = str | None
-        else:
-            # Required parameter
-            simple_annotations[param_name] = str
-    simple_annotations["return"] = Any
-    async_wrapper.__annotations__ = simple_annotations  # type: ignore[attr-defined]
+    # Preserve type annotations by normalizing SDK types to FastMCP-compatible types
+    try:
+        type_hints = get_type_hints(method)
+    except Exception:
+        # If type hints fail, fallback to signature annotations
+        type_hints = {}
+        for param_name, param in sig.parameters.items():
+            if param.annotation is not inspect.Parameter.empty:
+                type_hints[param_name] = param.annotation
 
+    normalized_annotations: dict[str, Any] = {}
+
+    # Track SDK-specific default values to replace
+    sdk_default_types = (NotGiven, Omit)
+    try:
+        from gcore import Timeout
+        sdk_default_types = (NotGiven, Omit, Timeout)
+    except ImportError:
+        pass
+
+    for param_name, param in sig.parameters.items():
+        if param_name in type_hints:
+            # Normalize SDK types (Union[T, NotGiven] → T | None, Iterable[T] → List[T])
+            param_type = type_hints[param_name]
+            normalized_type = normalize_sdk_type_for_mcp(param_type)
+            normalized_annotations[param_name] = normalized_type
+        elif param.default is not inspect.Parameter.empty:
+            # Has default but no type hint - make optional Any
+            normalized_annotations[param_name] = Any | None
+        else:
+            # Required but no type hint - use Any
+            normalized_annotations[param_name] = Any
+
+    normalized_annotations["return"] = Any
+    async_wrapper.__annotations__ = normalized_annotations  # type: ignore[attr-defined]
     async_wrapper.__doc__ = method.__doc__ or f"Proxy for `{full_name}`"
+
+    # Replace SDK-specific default values with None to avoid Pydantic warnings
+    # This creates a new signature with JSON-serializable defaults
+    new_params = []
+    for param_name, param in sig.parameters.items():
+        if param.default is not inspect.Parameter.empty:
+            # Check if default is an SDK-specific type
+            if isinstance(param.default, sdk_default_types) or type(param.default).__name__ in ('NotGiven', 'Omit', 'Timeout'):
+                # Replace with None
+                new_param = param.replace(default=None)
+                new_params.append(new_param)
+            else:
+                new_params.append(param)
+        else:
+            new_params.append(param)
+
+    # Update wrapper's signature with JSON-serializable defaults
+    async_wrapper.__signature__ = sig.replace(parameters=new_params)  # type: ignore[attr-defined]
+
     return async_wrapper
 
 

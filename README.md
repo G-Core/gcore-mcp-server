@@ -85,6 +85,7 @@ The system includes several predefined toolsets for common workflows:
 - **`baremetal`**: Bare metal server operations
 - **`gpu_baremetal`**: GPU cluster management
 - **`ai_ml`**: AI/ML inference services
+- **`billing`**: Cost reports and billing information
 - **`cleanup`**: Deletion and cleanup operations
 - **`list`**: List/read-only operations
 
@@ -120,9 +121,60 @@ export GCORE_TOOLS="gpu_baremetal,cloud.instances.create,waap.*"
 # All services with wildcard
 export GCORE_TOOLS="cloud.*,waap.*"
 
+# Billing and cost reports
+export GCORE_TOOLS="billing"
+
+# Management with billing insights
+export GCORE_TOOLS="management,billing"
+
 # Minimal setup
 export GCORE_TOOLS="instances"
 ```
+
+### Using the Billing Toolset
+
+The `billing` toolset provides access to cloud cost reports and billing information. To use it, configure your MCP server with the billing toolset:
+
+```json
+{
+  "mcpServers": {
+    "gcore-mcp-server": {
+      "command": "uvx",
+      "args": ["--from", "gcore-mcp-server@git+https://github.com/G-Core/gcore-mcp-server.git", "gcore-mcp-server"],
+      "env": {
+        "GCORE_API_KEY": "your-api-key",
+        "GCORE_TOOLS": "billing"
+      }
+    }
+  }
+}
+```
+
+#### Available Billing Tools
+
+The billing toolset includes three main tools:
+
+1. **`cloud_cost_rpts_get_agg`** - Get aggregated cost report totals (pay-as-you-go only)
+   - Parameters: `time_from` (datetime), `time_to` (datetime)
+   - Returns total costs for the specified period
+
+2. **`cloud_cost_rpts_get_agg_mon`** - Get monthly aggregated cost report
+   - Includes both pay-as-you-go and reserved resources
+   - Returns comprehensive monthly billing summary
+
+3. **`cloud_cost_rpts_get_det`** - Get detailed cost breakdown
+   - Provides granular cost information by resource type
+   - Useful for detailed billing analysis
+
+#### Example Usage via MCP
+
+Once configured, you can ask your AI assistant questions like:
+
+- "Show me the aggregated cloud costs for January 2024"
+- "Get the monthly cost report for this month"
+- "What are the detailed costs broken down by service?"
+
+The MCP server will automatically invoke the appropriate billing tools and return the cost information.
 
 ## Running in a Temporary Environment (One-off Execution)
 
