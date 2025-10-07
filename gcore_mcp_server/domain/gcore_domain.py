@@ -35,6 +35,50 @@ GCORE_SPECIAL_PARAMETERS: Set[str] = {
 }
 
 
+# Guidance constants shared across server components
+MCP_PROJECT_REGION_INSTRUCTIONS: str = (
+    "This server provides access to the Gcore API. Resolve project and region IDs "
+    "before invoking cloud tools. When a request names a project, use "
+    "`cloud.projects.list` or `cloud.projects.get` to find its numeric project_id. "
+    "If no project is specified, look up the account's default project with "
+    "`cloud.projects.list` and use its ID. Follow the same workflow for regions using "
+    "`cloud.regions.list`/`cloud.regions.get`, and always pass project_id and "
+    "region_id to tools that accept them."
+)
+
+PROJECT_ID_TOOL_NOTE: str = (
+    "Pass the numeric project_id. When a project name is provided, resolve it via "
+    "`cloud.projects.list`/`cloud.projects.get`. If nothing is specified, fetch the "
+    "account's default project first and use that ID."
+)
+
+REGION_ID_TOOL_NOTE: str = (
+    "Pass the numeric region_id. Resolve region names with `cloud.regions.list` or "
+    "`cloud.regions.get`. If no region is mentioned, obtain the default region ID "
+    "before calling this tool."
+)
+
+PROJECT_ID_REQUIRED_ERROR: str = (
+    "project_id is required for this call because the server was started without "
+    "GCORE_CLOUD_PROJECT_ID. Call `cloud.projects.list` to retrieve the default "
+    "project_id or resolve the requested project by name, then retry with that "
+    "numeric ID."
+)
+
+REGION_ID_REQUIRED_ERROR: str = (
+    "region_id is required for this call because the server was started without "
+    "GCORE_CLOUD_REGION_ID. Use `cloud.regions.list` or `cloud.regions.get` to obtain "
+    "the appropriate numeric ID, then retry."
+)
+
+PROJECT_REGION_LOOKUP_TOOLS: tuple[str, ...] = (
+    "cloud.projects.list",
+    "cloud.projects.get",
+    "cloud.regions.list",
+    "cloud.regions.get",
+)
+
+
 class GcoreDomainHandler:
     """Handler for Gcore SDK domain-specific logic."""
 

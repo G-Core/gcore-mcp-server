@@ -28,7 +28,7 @@ from typing import Any, Callable
 from functools import wraps
 from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7.1
 from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
-from typing import get_type_hints
+from typing import get_type_hints, get_origin, get_args, Union as TypingUnion
 from gcore import Gcore
 import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
@@ -38,13 +38,21 @@ from gcore_mcp_server.config.settings import (
     generate_short_tool_name,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
+from gcore_mcp_server.domain import (
+    MCP_PROJECT_REGION_INSTRUCTIONS,
+    PROJECT_ID_TOOL_NOTE,
+    REGION_ID_TOOL_NOTE,
+    PROJECT_ID_REQUIRED_ERROR,
+    REGION_ID_REQUIRED_ERROR,
+    PROJECT_REGION_LOOKUP_TOOLS,
+)
 
 logger = logging.getLogger("gcore-mcp")
 logging.basicConfig(level="INFO", format="%(levelname)s | %(message)s")
 
 # MCP Server Configuration
 MCP_NAME = "gcore-api"
-MCP_INSTRUCTIONS = "This server provides access to Gcore API"
+MCP_INSTRUCTIONS = MCP_PROJECT_REGION_INSTRUCTIONS
 
 ###############################################################################
 # Build a FastMCP wrapper around an SDK method
@@ -90,7 +98,32 @@ def _serialize_result(result: Any) -> Any:  # noqa: ANN401
     return str(result)
 
 
-def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., Any]:
+def _strip_optional(annotation: Any) -> Any:
+    """Remove Optional[...]/Union[..., None] from a type annotation."""
+    origin = get_origin(annotation)
+    args = tuple(arg for arg in get_args(annotation) if arg is not type(None))  # noqa: E721
+    if not args:
+        return annotation
+    if len(args) == 1:
+        return args[0]
+    try:
+        return TypingUnion.__getitem__(args)
+    except TypeError:
+        result = args[0]
+        for arg in args[1:]:
+            try:
+                result = result | arg  # type: ignore[operator]
+            except TypeError:
+                return annotation
+        return result
+
+
+def make_wrapper(
+    method: Callable[..., Any],
+    full_name: str,
+    require_project_param: bool,
+    require_region_param: bool,
+) -> Callable[..., Any]:
     """Create an async wrapper that preserves SDK type information for FastMCP."""
     from gcore import NotGiven, Omit
 
@@ -104,6 +137,11 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
     async def async_wrapper(**kwargs: Any) -> Any:  # noqa: ANN401 – dynamic
         # Filter out None values for optional parameters
         filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+        if require_project_param and has_project_param and "project_id" not in filtered_kwargs:
+            raise ValueError(PROJECT_ID_REQUIRED_ERROR)
+        if require_region_param and has_region_param and "region_id" not in filtered_kwargs:
+            raise ValueError(REGION_ID_REQUIRED_ERROR)
 
         # Backward compatibility: JSON string → object conversion
         # This allows clients to still pass JSON strings if needed
@@ -160,6 +198,18 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
         logger.error("Failed to normalize annotations for %s: %s", full_name, e)
         raise
 
+    has_project_param = "project_id" in normalized_annotations
+    has_region_param = "region_id" in normalized_annotations
+
+    if require_project_param and has_project_param:
+        normalized_annotations["project_id"] = _strip_optional(
+            normalized_annotations["project_id"]
+        )
+    if require_region_param and has_region_param:
+        normalized_annotations["region_id"] = _strip_optional(
+            normalized_annotations["region_id"]
+        )
+
     normalized_annotations["return"] = Any
     async_wrapper.__annotations__ = normalized_annotations  # type: ignore[attr-defined]
     async_wrapper.__doc__ = method.__doc__ or f"Proxy for `{full_name}`"
@@ -182,11 +232,42 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
             else:
                 new_params.append(param)
 
+        updated_params = []
+        for param in new_params:
+            if (
+                require_project_param
+                and has_project_param
+                and param.name == "project_id"
+                and param.default is None
+            ):
+                updated_params.append(param.replace(default=inspect.Parameter.empty))
+            elif (
+                require_region_param
+                and has_region_param
+                and param.name == "region_id"
+                and param.default is None
+            ):
+                updated_params.append(param.replace(default=inspect.Parameter.empty))
+            else:
+                updated_params.append(param)
+
         # Update wrapper's signature with JSON-serializable defaults
-        async_wrapper.__signature__ = sig.replace(parameters=new_params)  # type: ignore[attr-defined]
+        async_wrapper.__signature__ = sig.replace(parameters=updated_params)  # type: ignore[attr-defined]
     except Exception as e:
         logger.error("Failed to update signature for %s: %s", full_name, e)
         raise
+
+    note_parts: list[str] = []
+    if require_project_param and has_project_param:
+        note_parts.append(PROJECT_ID_TOOL_NOTE)
+    if require_region_param and has_region_param:
+        note_parts.append(REGION_ID_TOOL_NOTE)
+    if note_parts:
+        note = " ".join(note_parts)
+        if async_wrapper.__doc__:
+            async_wrapper.__doc__ = f"{async_wrapper.__doc__}\n\nNote: {note}"
+        else:
+            async_wrapper.__doc__ = f"Note: {note}"
 
     return async_wrapper
 
@@ -219,6 +300,8 @@ if TRANSPORT != "stdio" and not os.getenv(UNIFIED_TOOLS_ENV_VAR):
 # Get all available tools from SDK for unified tool selection
 mcp: Any = FastMCP(name=MCP_NAME, instructions=MCP_INSTRUCTIONS)
 client = Gcore()
+enforce_project_param = client.cloud_project_id is None
+enforce_region_param = client.cloud_region_id is None
 
 # Log Gcore SDK version
 gcore_version = getattr(gcore, "__version__", "unknown")
@@ -228,6 +311,15 @@ all_full_tool_names = [full_name for full_name, _ in iter_sdk_methods(client)]
 
 # Use unified tool selection approach
 ALLOWED_TOOLS_SHORT: set[str] = set(get_allowed_tools_list(all_full_tool_names))
+
+required_lookup_short = {
+    generate_short_tool_name(tool_name) for tool_name in PROJECT_REGION_LOOKUP_TOOLS
+}
+ALLOWED_TOOLS_SHORT.update(required_lookup_short)
+logger.info(
+    "Ensuring project/region lookup tools are available: %s",
+    sorted(required_lookup_short),
+)
 logger.info("Unified tools config → %s", os.getenv(UNIFIED_TOOLS_ENV_VAR, "<default>"))
 logger.info("Total allowed tools: %d", len(ALLOWED_TOOLS_SHORT))
 
@@ -246,7 +338,9 @@ for full_name, method in iter_sdk_methods(client):
         continue  # not enabled for this run
 
     try:
-        wrapper = make_wrapper(method, full_name)
+        wrapper = make_wrapper(
+            method, full_name, enforce_project_param, enforce_region_param
+        )
         tool_name = short_name.replace(".", "_")  # client-facing identifier
         wrapper.__name__ = tool_name  # consistent naming
 
