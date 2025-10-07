@@ -230,7 +230,7 @@ wheels = [
 
 [[package]]
 name = "gcore"
-version = "0.5.0"
+version = "0.15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -240,9 +240,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/b3/192d9175f7b5cb73f74fab4f87fe10ff12d0621c218c03d45768464b7480/gcore-0.5.0.tar.gz", hash = "sha256:e70e19bad2c9ba423168b74fa51d688ed4d1fbd83c5d4efe1066fd79d082e98d", size = 439729, upload-time = "2025-07-14T11:14:14.6Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/b7/4ffd7d60a7ac275683e404e617d9c9cdd3fc2fdb9adde4acfe3b75f4c3d3/gcore-0.15.0.tar.gz", hash = "sha256:7d4012ce96a6f80af93261ab2b0673551b8dd888cafba5c04dfb84a5bfb17dea", size = 886727, upload-time = "2025-10-03T07:47:41.87Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/44/8121def5819f3d78455e48f01d0361f27017d81176d4859debf2ab34e66c/gcore-0.5.0-py3-none-any.whl", hash = "sha256:701f9140675ba770e25f7885b93c9c324a03e732908abf8d05a65f69a060a946", size = 669221, upload-time = "2025-07-14T11:14:13.091Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/84/e88ab27f35ba62b3eb74cc6c81ecbb807237ac55d93c471bbd0480255ab7/gcore-0.15.0-py3-none-any.whl", hash = "sha256:f8bae20e3a260b81b8a5972b94d7debe8d62e40b3d9a40f2c8fb35f83c5a23c6", size = 1298455, upload-time = "2025-10-03T07:47:40.655Z" },
 ]
 
 [[package]]
