@@ -232,8 +232,6 @@ class GcoreDomainHandler:
                 "cloud.instances.enable_port_security",
                 "cloud.instances.action",
                 "cloud.instances.flavors.list",
-                "cloud.instances.flavors.list_suitable",
-                "cloud.instances.flavors.list_for_resize",
                 "cloud.instances.interfaces.list",
                 "cloud.instances.interfaces.attach",
                 "cloud.instances.interfaces.detach",
@@ -262,7 +260,6 @@ class GcoreDomainHandler:
                 "cloud.baremetal.disable_port_security",
                 "cloud.baremetal.enable_port_security",
                 "cloud.baremetal.flavors.list",
-                "cloud.baremetal.flavors.list_suitable",
                 "cloud.baremetal.interfaces.list",
                 "cloud.baremetal.interfaces.attach",
                 "cloud.baremetal.interfaces.detach",
@@ -398,7 +395,7 @@ class GcoreDomainHandler:
                 "cloud.projects.create",
                 "cloud.projects.list",
                 "cloud.projects.get",
-                "cloud.projects.update",
+                "cloud.projects.replace",
                 "cloud.projects.delete",
                 # Regions
                 "cloud.regions.list",
@@ -407,7 +404,6 @@ class GcoreDomainHandler:
                 "cloud.placement_groups.create",
                 "cloud.placement_groups.list",
                 "cloud.placement_groups.get",
-                "cloud.placement_groups.update",
                 "cloud.placement_groups.delete",
                 # Tasks
                 "cloud.tasks.list",
@@ -415,8 +411,9 @@ class GcoreDomainHandler:
                 "cloud.tasks.acknowledge_all",
                 "cloud.tasks.acknowledge_one",
                 # Quotas
-                "cloud.quotas.list",
-                "cloud.quotas.get",
+                "cloud.quotas.get_all",
+                "cloud.quotas.get_by_region",
+                "cloud.quotas.get_global",
             ],
             "ai": [
                 # AI Clusters
