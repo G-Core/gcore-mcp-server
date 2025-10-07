@@ -30,6 +30,7 @@ from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7
 from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
 from typing import get_type_hints
 from gcore import Gcore
+import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import (
@@ -93,7 +94,11 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
     """Create an async wrapper that preserves SDK type information for FastMCP."""
     from gcore import NotGiven, Omit
 
-    sig = inspect.signature(method)
+    try:
+        sig = inspect.signature(method)
+    except Exception as e:
+        logger.error("Failed to get signature for %s: %s", full_name, e)
+        raise
 
     @wraps(method)
     async def async_wrapper(**kwargs: Any) -> Any:  # noqa: ANN401 – dynamic
@@ -119,7 +124,8 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
     # Preserve type annotations by normalizing SDK types to FastMCP-compatible types
     try:
         type_hints = get_type_hints(method)
-    except Exception:
+    except Exception as e:
+        logger.warning("Failed to get type hints for %s: %s", full_name, e)
         # If type hints fail, fallback to signature annotations
         type_hints = {}
         for param_name, param in sig.parameters.items():
@@ -132,22 +138,27 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
     sdk_default_types = (NotGiven, Omit)
     try:
         from gcore import Timeout
+
         sdk_default_types = (NotGiven, Omit, Timeout)
     except ImportError:
         pass
 
-    for param_name, param in sig.parameters.items():
-        if param_name in type_hints:
-            # Normalize SDK types (Union[T, NotGiven] → T | None, Iterable[T] → List[T])
-            param_type = type_hints[param_name]
-            normalized_type = normalize_sdk_type_for_mcp(param_type)
-            normalized_annotations[param_name] = normalized_type
-        elif param.default is not inspect.Parameter.empty:
-            # Has default but no type hint - make optional Any
-            normalized_annotations[param_name] = Any | None
-        else:
-            # Required but no type hint - use Any
-            normalized_annotations[param_name] = Any
+    try:
+        for param_name, param in sig.parameters.items():
+            if param_name in type_hints:
+                # Normalize SDK types (Union[T, NotGiven] → T | None, Iterable[T] → List[T])
+                param_type = type_hints[param_name]
+                normalized_type = normalize_sdk_type_for_mcp(param_type)
+                normalized_annotations[param_name] = normalized_type
+            elif param.default is not inspect.Parameter.empty:
+                # Has default but no type hint - make optional Any
+                normalized_annotations[param_name] = Any | None
+            else:
+                # Required but no type hint - use Any
+                normalized_annotations[param_name] = Any
+    except Exception as e:
+        logger.error("Failed to normalize annotations for %s: %s", full_name, e)
+        raise
 
     normalized_annotations["return"] = Any
     async_wrapper.__annotations__ = normalized_annotations  # type: ignore[attr-defined]
@@ -155,21 +166,27 @@ def make_wrapper(method: Callable[..., Any], full_name: str) -> Callable[..., An
 
     # Replace SDK-specific default values with None to avoid Pydantic warnings
     # This creates a new signature with JSON-serializable defaults
-    new_params = []
-    for param_name, param in sig.parameters.items():
-        if param.default is not inspect.Parameter.empty:
-            # Check if default is an SDK-specific type
-            if isinstance(param.default, sdk_default_types) or type(param.default).__name__ in ('NotGiven', 'Omit', 'Timeout'):
-                # Replace with None
-                new_param = param.replace(default=None)
-                new_params.append(new_param)
+    try:
+        new_params = []
+        for param_name, param in sig.parameters.items():
+            if param.default is not inspect.Parameter.empty:
+                # Check if default is an SDK-specific type
+                if isinstance(param.default, sdk_default_types) or type(
+                    param.default
+                ).__name__ in ("NotGiven", "Omit", "Timeout"):
+                    # Replace with None
+                    new_param = param.replace(default=None)
+                    new_params.append(new_param)
+                else:
+                    new_params.append(param)
             else:
                 new_params.append(param)
-        else:
-            new_params.append(param)
 
-    # Update wrapper's signature with JSON-serializable defaults
-    async_wrapper.__signature__ = sig.replace(parameters=new_params)  # type: ignore[attr-defined]
+        # Update wrapper's signature with JSON-serializable defaults
+        async_wrapper.__signature__ = sig.replace(parameters=new_params)  # type: ignore[attr-defined]
+    except Exception as e:
+        logger.error("Failed to update signature for %s: %s", full_name, e)
+        raise
 
     return async_wrapper
 
@@ -203,6 +220,10 @@ if TRANSPORT != "stdio" and not os.getenv(UNIFIED_TOOLS_ENV_VAR):
 mcp: Any = FastMCP(name=MCP_NAME, instructions=MCP_INSTRUCTIONS)
 client = Gcore()
 
+# Log Gcore SDK version
+gcore_version = getattr(gcore, "__version__", "unknown")
+logger.info("Gcore SDK version: %s", gcore_version)
+
 all_full_tool_names = [full_name for full_name, _ in iter_sdk_methods(client)]
 
 # Use unified tool selection approach
@@ -214,21 +235,46 @@ logger.info("Total allowed tools: %d", len(ALLOWED_TOOLS_SHORT))
 # Build the FastMCP application
 ###############################################################################
 
+# Track which allowed tools actually exist as SDK methods
 registered = 0
+registered_short_names: set[str] = set()
+failed_registrations: list[tuple[str, str]] = []  # (full_name, error)
+
 for full_name, method in iter_sdk_methods(client):
     short_name = generate_short_tool_name(full_name)
     if short_name not in ALLOWED_TOOLS_SHORT:
         continue  # not enabled for this run
 
-    wrapper = make_wrapper(method, full_name)
-    tool_name = short_name.replace(".", "_")  # client-facing identifier
-    wrapper.__name__ = tool_name  # consistent naming
+    try:
+        wrapper = make_wrapper(method, full_name)
+        tool_name = short_name.replace(".", "_")  # client-facing identifier
+        wrapper.__name__ = tool_name  # consistent naming
 
-    tool = Tool.from_function(wrapper, name=tool_name, description=wrapper.__doc__)
-    mcp.add_tool(tool)
-    registered += 1
+        tool = Tool.from_function(wrapper, name=tool_name, description=wrapper.__doc__)
+        mcp.add_tool(tool)
+        registered += 1
+        registered_short_names.add(short_name)
+    except Exception as e:
+        logger.error("Failed to register tool %s: %s", full_name, e)
+        failed_registrations.append((full_name, str(e)))
 
 logger.info("Registered %d tools", registered)
+
+# Check for allowed tools that don't exist as SDK methods
+missing_tools = ALLOWED_TOOLS_SHORT - registered_short_names
+if missing_tools:
+    logger.warning(
+        "Tools in allowed list but not found in SDK (%d): %s",
+        len(missing_tools),
+        sorted(missing_tools),
+    )
+
+if failed_registrations:
+    logger.error(
+        "Failed to register %d tools: %s",
+        len(failed_registrations),
+        failed_registrations,
+    )
 
 ###############################################################################
 # Run
