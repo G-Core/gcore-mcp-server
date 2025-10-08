@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 UNIFIED_TOOLS_ENV_VAR: Final[str] = "GCORE_TOOLS"
 MAX_TOOL_NAME_LEN: Final[int] = 60
 
+
 def get_shortening_rules() -> dict[str, str]:
     """Get combined shortening rules from domain handler."""
     domain_handler = get_gcore_domain_handler()
@@ -109,33 +110,33 @@ def convert_pattern_to_regex(pattern: str) -> str:
 
 def get_unified_tool_config() -> tuple[list[str], list[str]]:
     """Get unified tool configuration from environment variable.
-    
+
     Returns:
         Tuple of (toolset_names, pattern_filters)
     """
     unified_config = os.getenv(UNIFIED_TOOLS_ENV_VAR)
     if unified_config:
         return parse_unified_tool_config(unified_config)
-    
+
     # Return empty lists if no config
     return [], []
 
 
 def parse_unified_tool_config(config_str: str) -> tuple[list[str], list[str]]:
     """Parse unified tool configuration string into toolsets and patterns.
-    
+
     Args:
         config_str: Comma-separated list of toolset names and/or patterns
-        
+
     Returns:
         Tuple of (toolset_names, pattern_filters)
     """
     from .toolsets import TOOLSETS  # Import here to avoid circular imports
-    
+
     entries = [entry.strip() for entry in config_str.split(",") if entry.strip()]
     toolset_names: list[str] = []
     pattern_filters: list[str] = []
-    
+
     for entry in entries:
         if entry in TOOLSETS:
             # Known toolset name
@@ -145,5 +146,5 @@ def parse_unified_tool_config(config_str: str) -> tuple[list[str], list[str]]:
             # Treat as pattern
             pattern_filters.append(entry)
             logger.debug("Treating '%s' as pattern", entry)
-    
+
     return toolset_names, pattern_filters

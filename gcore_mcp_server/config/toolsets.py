@@ -157,7 +157,7 @@ def get_active_toolset_names() -> list[str]:
     toolset_names, _ = get_unified_tool_config()
     if toolset_names or os.getenv(UNIFIED_TOOLS_ENV_VAR) is not None:
         return toolset_names
-    
+
     # Fall back to defaults if no config
     return DEFAULT_TOOLSETS
 
@@ -166,21 +166,25 @@ def get_allowed_tools_list(all_available_tools: list[str] | None = None) -> list
     """
     Constructs a flat list of all tools using unified configuration.
     Automatically detects toolsets vs patterns and combines them with toolset priority.
-    
+
     Args:
         all_available_tools: List of all available tool names from SDK (full names, not shortened).
                            If None, only toolset-based tools are returned.
-        
+
     Returns:
         List of tool names (shortened) allowed by the current configuration.
     """
     # Get unified configuration
     toolset_names, pattern_filters = get_unified_tool_config()
-    
+
     # If no unified config, fall back to defaults
-    if not toolset_names and not pattern_filters and os.getenv(UNIFIED_TOOLS_ENV_VAR) is None:
+    if (
+        not toolset_names
+        and not pattern_filters
+        and os.getenv(UNIFIED_TOOLS_ENV_VAR) is None
+    ):
         toolset_names = DEFAULT_TOOLSETS
-    
+
     # Get tools from toolsets
     toolset_tools: list[str] = []
     for toolset_name in toolset_names:
@@ -188,10 +192,10 @@ def get_allowed_tools_list(all_available_tools: list[str] | None = None) -> list
             toolset_tools.extend(TOOLSETS[toolset_name])
         else:
             logger.warning("Unknown toolset '%s', skipping", toolset_name)
-    
+
     # Remove duplicates from toolset tools while preserving order
     toolset_tools = list(dict.fromkeys(toolset_tools))
-    
+
     # Get tools from patterns if any patterns exist and we have available tools
     pattern_matched_tools: list[str] = []
     if pattern_filters and all_available_tools:
@@ -199,33 +203,33 @@ def get_allowed_tools_list(all_available_tools: list[str] | None = None) -> list
         for tool_name in all_available_tools:
             for pattern in pattern_filters:
                 if pattern == tool_name or (
-                    "*" in pattern 
+                    "*" in pattern
                     and __import__("re").match(
-                        __import__("re").escape(pattern).replace(r"\*", r".*"), 
-                        tool_name
+                        __import__("re").escape(pattern).replace(r"\*", r".*"),
+                        tool_name,
                     )
                 ):
                     pattern_matched_tools.append(tool_name)
                     break
-        
+
         # Convert to shortened names
         pattern_matched_tools = [
             generate_short_tool_name(tool_name) for tool_name in pattern_matched_tools
         ]
-    
+
     # Combine with toolset tools having priority
     combined_dict: dict[str, None] = dict.fromkeys(
         toolset_tools + pattern_matched_tools
     )
     combined_tools = list(combined_dict.keys())
-    
+
     logger.info(
         "Unified tool selection: %d from toolsets, %d from patterns, %d total unique",
         len(toolset_tools),
         len(pattern_matched_tools),
         len(combined_tools),
     )
-    
+
     return combined_tools
 
 
@@ -250,6 +254,3 @@ def derive_allowed_resources(tool_list: list[str]) -> list[str]:
             resource = parts[1]
             resources.add(resource)
     return sorted(list(resources))
-
-
-

@@ -297,7 +297,10 @@ class TestE2ESmoke:
         # Find the cost_reports.get_aggregated method
         method = None
         for full_name, sdk_method in iter_sdk_methods(client):
-            if "cost_reports.get_aggregated" in full_name and "monthly" not in full_name:
+            if (
+                "cost_reports.get_aggregated" in full_name
+                and "monthly" not in full_name
+            ):
                 method = sdk_method
                 break
 
@@ -328,7 +331,9 @@ class TestE2ESmoke:
         )
 
         # Find the array type in anyOf
-        array_schemas = [s for s in projects_schema["anyOf"] if s.get("type") == "array"]
+        array_schemas = [
+            s for s in projects_schema["anyOf"] if s.get("type") == "array"
+        ]
         assert len(array_schemas) >= 1, (
             f"Expected at least one array schema, got: {projects_schema}"
         )
@@ -368,6 +373,7 @@ class TestE2ESmoke:
         # projects should be List[int] | None after normalization
         from typing import get_origin, get_args
         import types
+
         projects_type = annotations["projects"]
         # Handle both Union and UnionType (T | U syntax)
         assert get_origin(projects_type) in (Union, types.UnionType)

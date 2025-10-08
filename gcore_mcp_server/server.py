@@ -28,7 +28,7 @@ from typing import Any, Callable
 from functools import wraps
 from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7.1
 from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
-from typing import get_type_hints, get_origin, get_args, Union as TypingUnion
+from typing import get_type_hints, get_args, Union as TypingUnion
 from gcore import Gcore
 import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
@@ -100,7 +100,6 @@ def _serialize_result(result: Any) -> Any:  # noqa: ANN401
 
 def _strip_optional(annotation: Any) -> Any:
     """Remove Optional[...]/Union[..., None] from a type annotation."""
-    origin = get_origin(annotation)
     args = tuple(arg for arg in get_args(annotation) if arg is not type(None))  # noqa: E721
     if not args:
         return annotation
@@ -138,9 +137,17 @@ def make_wrapper(
         # Filter out None values for optional parameters
         filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
-        if require_project_param and has_project_param and "project_id" not in filtered_kwargs:
+        if (
+            require_project_param
+            and has_project_param
+            and "project_id" not in filtered_kwargs
+        ):
             raise ValueError(PROJECT_ID_REQUIRED_ERROR)
-        if require_region_param and has_region_param and "region_id" not in filtered_kwargs:
+        if (
+            require_region_param
+            and has_region_param
+            and "region_id" not in filtered_kwargs
+        ):
             raise ValueError(REGION_ID_REQUIRED_ERROR)
 
         # Backward compatibility: JSON string → object conversion

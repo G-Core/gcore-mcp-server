@@ -8,6 +8,7 @@ from typing import (
 )
 
 from gcore import NotGiven, Omit
+
 try:
     from gcore import Timeout
 except ImportError:
@@ -32,8 +33,8 @@ def _is_pydantic_compatible(param_type: Any) -> bool:
         return False
 
     # Check for problematic type names
-    if hasattr(param_type, '__name__'):
-        incompatible_names = {'IO', 'BinaryIO', 'TextIO'}
+    if hasattr(param_type, "__name__"):
+        incompatible_names = {"IO", "BinaryIO", "TextIO"}
         if param_type.__name__ in incompatible_names:
             return False
 
@@ -77,18 +78,22 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
         return str
 
     # Handle IO types - convert to string (for file paths)
-    if origin is IO or (hasattr(param_type, '__name__') and param_type.__name__ == 'IO'):
+    if origin is IO or (
+        hasattr(param_type, "__name__") and param_type.__name__ == "IO"
+    ):
         return str
 
     # Handle PathLike - convert to string
-    if param_type is os.PathLike or (hasattr(param_type, '__name__') and 'PathLike' in param_type.__name__):
+    if param_type is os.PathLike or (
+        hasattr(param_type, "__name__") and "PathLike" in param_type.__name__
+    ):
         return str
 
     # SDK-specific types to filter out
     sdk_types = {Omit, NotGiven, type(None)}
     if Timeout is not None:
         sdk_types.add(Timeout)
-    sdk_type_names = {'Omit', 'NotGiven', 'Timeout'}
+    sdk_type_names = {"Omit", "NotGiven", "Timeout"}
 
     # Handle Union types (both Union[...] and T | U syntax) with SDK-specific markers
     if origin is Union or origin is types.UnionType:
@@ -99,14 +104,14 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
             if arg in sdk_types:
                 continue
             # Also check string representation for edge cases
-            if hasattr(arg, '__name__') and arg.__name__ in sdk_type_names:
+            if hasattr(arg, "__name__") and arg.__name__ in sdk_type_names:
                 continue
             actual_args.append(arg)
 
         has_none = type(None) in args
         has_sdk_marker = any(
-            arg in sdk_types or
-            (hasattr(arg, '__name__') and arg.__name__ in sdk_type_names)
+            arg in sdk_types
+            or (hasattr(arg, "__name__") and arg.__name__ in sdk_type_names)
             for arg in args
         )
 
@@ -154,6 +159,7 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
 
     # Handle Mapping/Dict types - recursively normalize value types
     from collections.abc import Mapping
+
     if origin in (dict, Mapping):
         if args and len(args) >= 2:
             # Normalize both key and value types
@@ -179,6 +185,7 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
         try:
             # Quick test: can Pydantic handle this?
             from pydantic import TypeAdapter
+
             TypeAdapter(param_type)
             # If we got here, Pydantic can handle it
             return param_type
@@ -186,6 +193,7 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
             # Pydantic can't handle it - convert to Any to be safe
             # This prevents server hangs but loses some type information
             import logging
+
             logger = logging.getLogger("gcore-mcp")
             logger.warning(
                 f"Type normalization: Unknown type {param_type} is not Pydantic-compatible, "

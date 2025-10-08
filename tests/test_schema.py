@@ -37,6 +37,7 @@ class TestNormalizeSDKTypeForMCP:
         result = normalize_sdk_type_for_mcp(Union[str, int, NotGiven])
         # Should be Union[str, int] | None
         from typing import get_origin, get_args
+
         assert get_origin(result) is Union
         args = get_args(result)
         # Should have Union[str, int] and None
@@ -61,6 +62,7 @@ class TestNormalizeSDKTypeForMCP:
     def test_list_type_preserved(self):
         """Test that List[T] passes through (may be normalized to list[T])."""
         from typing import get_origin, get_args
+
         list_type = List[str]
         result = normalize_sdk_type_for_mcp(list_type)
         # Should be a list type with str items
@@ -75,21 +77,25 @@ class TestNormalizeSDKTypeForMCP:
     def test_io_type_normalized(self):
         """Test that IO[bytes] is normalized to str."""
         from typing import IO
+
         result = normalize_sdk_type_for_mcp(IO[bytes])
         assert result is str
 
     def test_pathlike_normalized(self):
         """Test that os.PathLike is normalized to str."""
         import os
+
         result = normalize_sdk_type_for_mcp(os.PathLike)
         assert result is str
 
     def test_union_with_io_normalized(self):
         """Test that Union[IO[bytes], bytes] is normalized properly."""
         from typing import IO, Union as TypingUnion
+
         result = normalize_sdk_type_for_mcp(TypingUnion[IO[bytes], bytes])
         # Should normalize IO[bytes] to str, keep bytes
         from typing import get_origin, get_args
+
         assert get_origin(result) is TypingUnion
         args = get_args(result)
         assert str in args
