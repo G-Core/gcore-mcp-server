@@ -304,7 +304,9 @@ class TestE2ESmoke:
         assert method is not None, "cloud.cost_reports.get_aggregated not found"
 
         # Create wrapper and check annotations
-        wrapper = make_wrapper(method, "cloud.cost_reports.get_aggregated")
+        wrapper = make_wrapper(
+            method, "cloud.cost_reports.get_aggregated", False, False
+        )
 
         # Check that wrapper has proper type annotations
         annotations = wrapper.__annotations__
@@ -357,7 +359,7 @@ class TestE2ESmoke:
         }
 
         # Create wrapper
-        wrapper = make_wrapper(mock_method, "test.mock_method")
+        wrapper = make_wrapper(mock_method, "test.mock_method", False, False)
 
         # Check wrapper annotations
         annotations = wrapper.__annotations__

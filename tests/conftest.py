@@ -1,5 +1,6 @@
 """Pytest fixtures for MCP Gcore tests."""
 
+import os
 from typing import Any, TypedDict, Optional, Union, Literal
 
 # Required and NotRequired live in typing (Python ≥3.11). For Python 3.10 fallback to typing_extensions.
@@ -13,6 +14,15 @@ from inspect import Parameter, Signature
 from gcore import Gcore
 
 import pytest
+
+
+@pytest.fixture(scope="session", autouse=True)
+def set_test_api_key():
+    """Set a dummy API key for all tests to avoid client initialization errors."""
+    os.environ["GCORE_API_KEY"] = "test-dummy-key-for-testing"
+    yield
+    # Cleanup after all tests
+    os.environ.pop("GCORE_API_KEY", None)
 
 
 class MockVolumeSpec(TypedDict, total=False):
