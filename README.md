@@ -28,7 +28,7 @@ Add the server to your Cursor IDE configuration file (`~/.cursor/mcp.json`):
 **Note:** You can find instructions on how to obtain a Gcore API Key [here](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token).
 
 **Optional variables:**
-- `GCORE_API_URL`: "https://api.gcore.com",
+- `GCORE_BASE_URL`: "https://api.gcore.com",
 - `GCORE_CLOUD_PROJECT_ID`: "1",
 - `GCORE_CLOUD_REGION_ID`: "76",
 - `GCORE_CLIENT_ID`: "2",
