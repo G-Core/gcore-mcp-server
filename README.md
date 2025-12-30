@@ -81,13 +81,17 @@ export GCORE_TOOLS="cloud.*,waap.*"
 The system includes several predefined toolsets for common workflows:
 
 - **`management`**: Core account and project management
-- **`instances`**: Virtual machine operations  
-- **`volumes`**: Storage management
-- **`networks`**: Network and security management
+- **`instances`**: Virtual machine operations
 - **`baremetal`**: Bare metal server operations
-- **`gpu_baremetal`**: GPU cluster management
+- **`gpu_baremetal`**: GPU bare metal cluster management
+- **`gpu_virtual`**: GPU virtual cluster management
+- **`networking`**: Networks, Floating IPs, Load Balancers
+- **`security`**: Security Groups, SSH Keys, Secrets
+- **`storage`**: Volumes, File Shares
+- **`ai`**: AI Clusters
 - **`ai_ml`**: AI/ML inference services
 - **`billing`**: Cost reports and billing information
+- **`containers`**: Container registries
 - **`cleanup`**: Deletion and cleanup operations
 - **`list`**: List/read-only operations
 
@@ -115,7 +119,7 @@ When using combined mode:
 export GCORE_TOOLS="cloud.instances.create,cloud.instances.delete,cloud.volumes.create"
 
 # Full cloud management
-export GCORE_TOOLS="management,instances,volumes,networks"
+export GCORE_TOOLS="management,instances,storage,networking"
 
 # GPU cluster operations with custom additions  
 export GCORE_TOOLS="gpu_baremetal,cloud.instances.create,waap.*"

@@ -53,6 +53,22 @@ def get_raw_toolsets() -> dict[str, list[str]]:
             "cloud.gpu_baremetal_clusters.images.get",
             "cloud.gpu_baremetal_clusters.images.delete",
         ],
+        "gpu_virtual": [
+            # GPU Virtual Clusters
+            "cloud.gpu_virtual_clusters.create",
+            "cloud.gpu_virtual_clusters.get",
+            "cloud.gpu_virtual_clusters.delete",
+            "cloud.gpu_virtual_clusters.list",
+            "cloud.gpu_virtual_clusters.update",
+            "cloud.gpu_virtual_clusters.interfaces.list",
+            "cloud.gpu_virtual_clusters.servers.list",
+            "cloud.gpu_virtual_clusters.servers.get",
+            "cloud.gpu_virtual_clusters.servers.get_console",
+            "cloud.gpu_virtual_clusters.flavors.list",
+            "cloud.gpu_virtual_clusters.images.list",
+            "cloud.gpu_virtual_clusters.images.get",
+            "cloud.gpu_virtual_clusters.volumes.list",
+        ],
         "ai_ml": [
             # Inference
             "cloud.inference.get_capacity_by_region",
