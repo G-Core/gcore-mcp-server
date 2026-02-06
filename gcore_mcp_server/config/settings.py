@@ -24,8 +24,6 @@ def get_shortening_rules() -> dict[str, str]:
         "interfaces": "ifaces",
         "metrics": "metr",
         "baremetal": "bm",
-        "gpu_baremetal_clusters": "gpu_bm_clusters",
-        "l7_policies": "l7pols",
         "health_monitors": "health_mon",
         "members": "membs",
         "statuses": "stats",
@@ -40,7 +38,6 @@ def get_shortening_rules() -> dict[str, str]:
         "requests": "reqs",
         "role_assignments": "roleasgns",
         "billing_reservations": "billresrvs",
-        "models": "mdls",
         "logs": "logs",
         "registry_credentials": "regcreds",
         # Method parts / verbs

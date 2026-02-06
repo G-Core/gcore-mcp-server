@@ -20,7 +20,7 @@ Add the server to your Cursor IDE configuration file (`~/.cursor/mcp.json`):
       "args": ["--from", "gcore-mcp-server@git+https://github.com/G-Core/gcore-mcp-server.git", "gcore-mcp-server"],
       "env": {
         "GCORE_API_KEY": "4***1",
-        "GCORE_TOOLS": "instances,management,cloud.gpu_baremetal_clusters.*"
+        "GCORE_TOOLS": "instances,management,cloud.gpu_baremetal.clusters.*"
       }
     }
   }
@@ -43,7 +43,7 @@ The server uses a **unified configuration approach** via the `GCORE_TOOLS` envir
 
 ```bash
 # Mixed toolsets and patterns
-export GCORE_TOOLS="instances,management,cloud.gpu_baremetal_clusters.*,dns.records.create"
+export GCORE_TOOLS="instances,management,cloud.gpu_baremetal.clusters.*,dns.records.create"
 
 # Only toolsets
 export GCORE_TOOLS="instances,management"
@@ -68,13 +68,13 @@ export GCORE_TOOLS="cloud.*,waap.*"
 3. **Pattern Mode** (custom tool filtering)
    - Use wildcard patterns to match tool names from the Gcore SDK
    - Exact matches: `cloud.instances.create`, `dns.records.delete`
-   - Wildcard matches: `cloud.*`, `waap.*`, `cloud.gpu_baremetal_clusters.*`
+   - Wildcard matches: `cloud.*`, `waap.*`, `cloud.gpu_baremetal.clusters.*`
    - Example: `GCORE_TOOLS="cloud.instances.*,waap.*"`
 
 4. **Combined Mode** (toolsets + patterns)
    - Mix predefined toolsets with custom patterns
    - Toolset definitions have priority over pattern matches
-   - Example: `GCORE_TOOLS="instances,cloud.gpu_baremetal_clusters.*"`
+   - Example: `GCORE_TOOLS="instances,cloud.gpu_baremetal.clusters.*"`
 
 #### Available Toolsets
 
