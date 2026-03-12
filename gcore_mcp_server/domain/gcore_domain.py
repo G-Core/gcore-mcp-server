@@ -439,7 +439,7 @@ class GcoreDomainHandler:
                 "cloud.projects.create",
                 "cloud.projects.list",
                 "cloud.projects.get",
-                "cloud.projects.replace",
+                "cloud.projects.update",
                 "cloud.projects.delete",
                 # Regions
                 "cloud.regions.list",
