@@ -6,7 +6,7 @@ MCP (Model Context Protocol) server for Gcore API. This server provides tools fo
 
 ## Usage
 
-**Note:** As we have multiple resources available, providing all of them at once to the LLM can overwhelm it and lead to confusion among the tools. It is recommended to specify only the necessary resources for your task to ensure optimal performance and clarity.
+**Note:** As we have multiple resources available, providing all of them at once to most LLM clients can overwhelm the model and lead to confusion among the tools. For most clients, it is recommended to specify only the necessary resources for your task to ensure optimal performance and clarity. Some clients, like Claude Code, handle this differently — see below.
 
 ### Integration with Cursor IDE
 
@@ -26,6 +26,31 @@ Add the server to your Cursor IDE configuration file (`~/.cursor/mcp.json`):
   }
 }
 ```
+
+### Integration with Claude Code
+
+Add the server to your Claude Code configuration file (`~/.claude.json`):
+
+```json
+{
+  "mcpServers": {
+    "gcore-mcp-server": {
+      "command": "uvx",
+      "args": ["--from", "gcore-mcp-server@git+https://github.com/G-Core/gcore-mcp-server.git", "gcore-mcp-server"],
+      "env": {
+        "GCORE_API_KEY": "4***1",
+        "GCORE_TOOLS": "*"
+      }
+    }
+  }
+}
+```
+
+Setting `GCORE_TOOLS=*` loads all available tools, which works well with Claude Code thanks to its **Tool Search** feature. Unlike other clients, Claude Code defers tool schema loading — tool schemas are only fetched on demand when they match a query. This means registering many tools doesn't bloat the context window.
+
+Claude Code shows a warning when tools exceed 10% of the context window. With deferred loading, this isn't an issue even with all tools enabled.
+
+The `uvx` command runs the server in a temporary environment without requiring a persistent installation. See [Running in a Temporary Environment](#running-in-a-temporary-environment-one-off-execution) for more details.
 
 **Note:** You can find instructions on how to obtain a Gcore API Key [here](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token).
 
