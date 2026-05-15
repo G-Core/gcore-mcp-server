@@ -179,3 +179,23 @@ async def test_call_tool_short_name_lookup():
 
     assert result == "ok"
     method.assert_called_once_with()
+
+
+@pytest.mark.anyio
+async def test_call_tool_passes_name_kwarg_to_sdk_method():
+    """An SDK method with its own ``name`` parameter can be invoked.
+
+    Regression: the dispatcher's first parameter is positional-only, so a
+    ``name`` keyword is forwarded to the SDK method (e.g.
+    ``cloud.ssh_keys.create``) instead of colliding with the tool selector.
+    """
+    method = Mock(return_value={"id": "k1"})
+    catalog = Catalog([_entry(method, full_name="cloud.ssh_keys.create")])
+    call_tool = make_call_tool(catalog, _make_client())
+
+    result = await call_tool(
+        "cloud.ssh_keys.create", name="my-key", public_key="ssh-ed25519 AAAA"
+    )
+
+    assert result == {"id": "k1"}
+    method.assert_called_once_with(name="my-key", public_key="ssh-ed25519 AAAA")

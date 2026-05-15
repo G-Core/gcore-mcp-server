@@ -18,7 +18,12 @@ def make_call_tool(
     catalog: Catalog,
     client: Any,
 ) -> Callable[..., Awaitable[Any]]:
-    """Return an async ``call_tool(name, **kwargs)`` for the sandbox.
+    """Return an async ``call_tool(tool_name, /, **kwargs)`` for the sandbox.
+
+    ``tool_name`` is positional-only so that SDK methods which themselves take
+    a ``name`` parameter (e.g. ``cloud.ssh_keys.create``) can still be invoked
+    as ``call_tool('cloud.ssh_keys.create', name='my-key')`` without the
+    keyword colliding with the dispatcher's own first parameter.
 
     The dispatcher:
       * looks up the SDK method by full or short name,
@@ -30,11 +35,11 @@ def make_call_tool(
         sandbox.
     """
 
-    async def call_tool(name: str, **kwargs: Any) -> Any:
-        entry = catalog.by_name.get(name)
+    async def call_tool(tool_name: str, /, **kwargs: Any) -> Any:
+        entry = catalog.by_name.get(tool_name)
         if entry is None:
             raise KeyError(
-                f"unknown tool: {name!r}. Try search_tools(query) to discover."
+                f"unknown tool: {tool_name!r}. Try search_tools(query) to discover."
             )
 
         if entry.requires_project and "project_id" not in kwargs:
@@ -49,7 +54,9 @@ def make_call_tool(
 
         method = entry.method
         if method is None:
-            raise RuntimeError(f"catalog entry for {name!r} has no underlying method")
+            raise RuntimeError(
+                f"catalog entry for {tool_name!r} has no underlying method"
+            )
 
         result = method(**kwargs)
         if _inspect.isawaitable(result):
