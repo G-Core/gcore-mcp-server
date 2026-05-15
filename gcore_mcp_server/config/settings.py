@@ -9,7 +9,30 @@ from ..domain import get_gcore_domain_handler
 logger = logging.getLogger(__name__)
 
 UNIFIED_TOOLS_ENV_VAR: Final[str] = "GCORE_TOOLS"
+ROUTING_ENV_VAR: Final[str] = "GCORE_MCP_ROUTING"
 MAX_TOOL_NAME_LEN: Final[int] = 60
+
+# Routing modes for GCORE_MCP_ROUTING.
+ROUTING_CODE_EXEC: Final[str] = "code_exec"
+ROUTING_DIRECT: Final[str] = "direct"
+ROUTING_DEFAULT: Final[str] = ROUTING_CODE_EXEC
+
+
+def get_routing_mode() -> str:
+    """Read and normalize the routing mode from the environment.
+
+    Returns ROUTING_CODE_EXEC (default), ROUTING_DIRECT, or — for unknown
+    values — falls back to ROUTING_CODE_EXEC after logging a warning.
+    """
+    raw = os.getenv(ROUTING_ENV_VAR, "").strip().lower()
+    if not raw:
+        return ROUTING_DEFAULT
+    if raw in (ROUTING_CODE_EXEC, ROUTING_DIRECT):
+        return raw
+    logger.warning(
+        "Unknown %s=%r, falling back to %r", ROUTING_ENV_VAR, raw, ROUTING_DEFAULT
+    )
+    return ROUTING_DEFAULT
 
 
 def get_shortening_rules() -> dict[str, str]:
