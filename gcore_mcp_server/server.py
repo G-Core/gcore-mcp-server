@@ -33,11 +33,15 @@ from gcore import Gcore
 import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
+from gcore_mcp_server.core.serialize import serialize_result
 from gcore_mcp_server.config.settings import (
     UNIFIED_TOOLS_ENV_VAR,
+    ROUTING_CODE_EXEC,
     generate_short_tool_name,
+    get_routing_mode,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
+from gcore_mcp_server.code_exec import build_catalog, register_meta_tools
 from gcore_mcp_server.domain import (
     MCP_PROJECT_REGION_INSTRUCTIONS,
     PROJECT_ID_TOOL_NOTE,
@@ -52,50 +56,28 @@ logging.basicConfig(level="INFO", format="%(levelname)s | %(message)s")
 
 # MCP Server Configuration
 MCP_NAME = "gcore-api"
-MCP_INSTRUCTIONS = MCP_PROJECT_REGION_INSTRUCTIONS
+
+CODE_EXEC_INSTRUCTIONS_PREAMBLE = (
+    "This server runs in code-execution mode. Only three meta-tools are "
+    "exposed: search_tools(query), get_tool_schema(name), and "
+    "execute_code(code). Call execute_code with a short Python script that "
+    "uses `await call_tool('cloud.<resource>.<method>', ...)` to invoke any "
+    "of the ~700 Gcore SDK methods. Inside the sandbox you also have "
+    "search_tools() and get_tool_schema() as functions. The sandbox supports "
+    "async/await, comprehensions, exceptions, and stdlib json/re/datetime; "
+    "it does NOT support class, with, import, match, or generators.\n\n"
+)
+
+
+def _build_instructions(routing_mode: str) -> str:
+    if routing_mode == ROUTING_CODE_EXEC:
+        return CODE_EXEC_INSTRUCTIONS_PREAMBLE + MCP_PROJECT_REGION_INSTRUCTIONS
+    return MCP_PROJECT_REGION_INSTRUCTIONS
+
 
 ###############################################################################
 # Build a FastMCP wrapper around an SDK method
 ###############################################################################
-
-
-def _serialize_result(result: Any) -> Any:  # noqa: ANN401
-    """Convert SDK result to JSON-serializable format."""
-    if result is None:
-        return None
-
-    # Handle basic types
-    if isinstance(result, (str, int, float, bool)):
-        return result
-
-    # Handle lists
-    if isinstance(result, list):
-        return [_serialize_result(item) for item in result]  # type: ignore[misc]
-
-    # Handle dicts
-    if isinstance(result, dict):
-        return {key: _serialize_result(value) for key, value in result.items()}  # type: ignore[misc]
-
-    # Handle objects with model_dump() method (Pydantic v2)
-    if hasattr(result, "model_dump") and callable(getattr(result, "model_dump")):
-        try:
-            return _serialize_result(result.model_dump())
-        except Exception:
-            pass
-
-    # Handle objects with __dict__
-    if hasattr(result, "__dict__"):
-        try:
-            obj_dict: dict[str, Any] = {}
-            for key, value in result.__dict__.items():
-                if not key.startswith("_"):  # Skip private attributes
-                    obj_dict[key] = _serialize_result(value)
-            return obj_dict
-        except Exception:
-            pass
-
-    # Fallback to string representation
-    return str(result)
 
 
 def _strip_optional(annotation: Any) -> Any:
@@ -164,7 +146,7 @@ def make_wrapper(
             result = await result
 
         # Serialize the result to ensure JSON compatibility
-        return _serialize_result(result)
+        return serialize_result(result)
 
     # Preserve type annotations by normalizing SDK types to FastMCP-compatible types
     try:
@@ -300,82 +282,110 @@ if _transport_raw not in _TRANSPORT_MAP:
         "Unknown GCORE_TRANSPORT '%s', falling back to 'stdio'", _transport_raw
     )
 
+ROUTING_MODE = get_routing_mode()
+
 # In HTTP mode enable *management* tools by default (unless explicitly set).
-if TRANSPORT != "stdio" and not os.getenv(UNIFIED_TOOLS_ENV_VAR):
+# Only applies to `direct` routing — the code_exec mode ignores GCORE_TOOLS.
+if (
+    TRANSPORT != "stdio"
+    and ROUTING_MODE != ROUTING_CODE_EXEC
+    and not os.getenv(UNIFIED_TOOLS_ENV_VAR)
+):
     os.environ[UNIFIED_TOOLS_ENV_VAR] = "management"
 
-# Get all available tools from SDK for unified tool selection
-mcp: Any = FastMCP(name=MCP_NAME, instructions=MCP_INSTRUCTIONS)
+mcp: Any = FastMCP(name=MCP_NAME, instructions=_build_instructions(ROUTING_MODE))
 client = Gcore()
-enforce_project_param = client.cloud_project_id is None
-enforce_region_param = client.cloud_region_id is None
 
 # Log Gcore SDK version
 gcore_version = getattr(gcore, "__version__", "unknown")
 logger.info("Gcore SDK version: %s", gcore_version)
-
-all_full_tool_names = [full_name for full_name, _ in iter_sdk_methods(client)]
-
-# Use unified tool selection approach
-ALLOWED_TOOLS_SHORT: set[str] = set(get_allowed_tools_list(all_full_tool_names))
-
-required_lookup_short = {
-    generate_short_tool_name(tool_name) for tool_name in PROJECT_REGION_LOOKUP_TOOLS
-}
-ALLOWED_TOOLS_SHORT.update(required_lookup_short)
-logger.info(
-    "Ensuring project/region lookup tools are available: %s",
-    sorted(required_lookup_short),
-)
-logger.info("Unified tools config → %s", os.getenv(UNIFIED_TOOLS_ENV_VAR, "<default>"))
-logger.info("Total allowed tools: %d", len(ALLOWED_TOOLS_SHORT))
+logger.info("Routing mode: %s", ROUTING_MODE)
 
 ###############################################################################
 # Build the FastMCP application
 ###############################################################################
 
-# Track which allowed tools actually exist as SDK methods
-registered = 0
-registered_short_names: set[str] = set()
-failed_registrations: list[tuple[str, str]] = []  # (full_name, error)
-
-for full_name, method in iter_sdk_methods(client):
-    short_name = generate_short_tool_name(full_name)
-    if short_name not in ALLOWED_TOOLS_SHORT:
-        continue  # not enabled for this run
-
-    try:
-        wrapper = make_wrapper(
-            method, full_name, enforce_project_param, enforce_region_param
+if ROUTING_MODE == ROUTING_CODE_EXEC:
+    if os.getenv(UNIFIED_TOOLS_ENV_VAR):
+        logger.info(
+            "GCORE_TOOLS is set but ignored in code_exec mode — the catalog "
+            "is searched dynamically from inside execute_code()."
         )
-        tool_name = short_name.replace(".", "_")  # client-facing identifier
-        wrapper.__name__ = tool_name  # consistent naming
-
-        tool = Tool.from_function(wrapper, name=tool_name, description=wrapper.__doc__)
-        mcp.add_tool(tool)
-        registered += 1
-        registered_short_names.add(short_name)
-    except Exception as e:
-        logger.error("Failed to register tool %s: %s", full_name, e)
-        failed_registrations.append((full_name, str(e)))
-
-logger.info("Registered %d tools", registered)
-
-# Check for allowed tools that don't exist as SDK methods
-missing_tools = ALLOWED_TOOLS_SHORT - registered_short_names
-if missing_tools:
-    logger.warning(
-        "Tools in allowed list but not found in SDK (%d): %s",
-        len(missing_tools),
-        sorted(missing_tools),
+    catalog = build_catalog(client)
+    register_meta_tools(mcp, catalog, client)
+    logger.info(
+        "Registered 3 meta-tools (search_tools, get_tool_schema, execute_code) "
+        "over %d SDK methods. Set GCORE_MCP_ROUTING=direct to restore the "
+        "legacy tool surface.",
+        len(catalog.entries),
     )
+else:
+    # Legacy direct mode: register each SDK method as its own MCP tool.
+    enforce_project_param = client.cloud_project_id is None
+    enforce_region_param = client.cloud_region_id is None
 
-if failed_registrations:
-    logger.error(
-        "Failed to register %d tools: %s",
-        len(failed_registrations),
-        failed_registrations,
+    all_full_tool_names = [full_name for full_name, _ in iter_sdk_methods(client)]
+
+    # Use unified tool selection approach
+    ALLOWED_TOOLS_SHORT: set[str] = set(get_allowed_tools_list(all_full_tool_names))
+
+    required_lookup_short = {
+        generate_short_tool_name(tool_name) for tool_name in PROJECT_REGION_LOOKUP_TOOLS
+    }
+    ALLOWED_TOOLS_SHORT.update(required_lookup_short)
+    logger.info(
+        "Ensuring project/region lookup tools are available: %s",
+        sorted(required_lookup_short),
     )
+    logger.info(
+        "Unified tools config → %s", os.getenv(UNIFIED_TOOLS_ENV_VAR, "<default>")
+    )
+    logger.info("Total allowed tools: %d", len(ALLOWED_TOOLS_SHORT))
+
+    # Track which allowed tools actually exist as SDK methods
+    registered = 0
+    registered_short_names: set[str] = set()
+    failed_registrations: list[tuple[str, str]] = []  # (full_name, error)
+
+    for full_name, method in iter_sdk_methods(client):
+        short_name = generate_short_tool_name(full_name)
+        if short_name not in ALLOWED_TOOLS_SHORT:
+            continue  # not enabled for this run
+
+        try:
+            wrapper = make_wrapper(
+                method, full_name, enforce_project_param, enforce_region_param
+            )
+            tool_name = short_name.replace(".", "_")  # client-facing identifier
+            wrapper.__name__ = tool_name  # consistent naming
+
+            tool = Tool.from_function(
+                wrapper, name=tool_name, description=wrapper.__doc__
+            )
+            mcp.add_tool(tool)
+            registered += 1
+            registered_short_names.add(short_name)
+        except Exception as e:
+            logger.error("Failed to register tool %s: %s", full_name, e)
+            failed_registrations.append((full_name, str(e)))
+
+    logger.info("Registered %d tools", registered)
+
+    # Check for allowed tools that don't exist as SDK methods
+    missing_tools = ALLOWED_TOOLS_SHORT - registered_short_names
+    if missing_tools:
+        logger.warning(
+            "Tools in allowed list but not found in SDK (%d): %s",
+            len(missing_tools),
+            sorted(missing_tools),
+        )
+
+    if failed_registrations:
+        logger.error(
+            "Failed to register %d tools: %s",
+            len(failed_registrations),
+            failed_registrations,
+        )
 
 ###############################################################################
 # Run
