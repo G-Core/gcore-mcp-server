@@ -98,21 +98,26 @@ class _TruncationState:
 
 
 def _truncate_value(value: Any, state: _TruncationState) -> Any:
-    """Depth-first walk that trims oversized lists/dicts to fit ``state.budget``."""
+    """Depth-first walk that trims a value to fit ``state.budget``.
+
+    Budget is decremented exactly once per scalar leaf (containers do not
+    re-account their children). Containers check the remaining budget *before*
+    descending into each child, so once the budget is exhausted the rest of a
+    list/dict is replaced with a ``{"_truncated": True, "_dropped_items": N}``
+    marker. Oversized scalar strings are truncated in place. In every
+    over-budget path ``state.hit`` is set, so the surrounding ``ExecResult``
+    never reports ``truncated=False`` while the byte cap was breached.
+    """
     if isinstance(value, list):
         list_value: list[Any] = value  # type: ignore[assignment]
         out: list[Any] = []
         total = len(list_value)
         for idx, item in enumerate(list_value):
-            trimmed = _truncate_value(item, state)
-            size = _json_size(trimmed)
-            if state.budget - size < 0 and out:
+            if state.budget <= 0:
                 state.hit = True
-                dropped = total - idx
-                out.append({"_truncated": True, "_dropped_items": dropped})
+                out.append({"_truncated": True, "_dropped_items": total - idx})
                 return out
-            state.budget -= size
-            out.append(trimmed)
+            out.append(_truncate_value(item, state))
         return out
 
     if isinstance(value, dict):
@@ -121,31 +126,45 @@ def _truncate_value(value: Any, state: _TruncationState) -> Any:
         keys: list[Any] = list(dict_value.keys())
         total_keys = len(keys)
         for idx, key in enumerate(keys):
-            v: Any = dict_value[key]
-            trimmed = _truncate_value(v, state)
-            entry_size = _json_size({key: trimmed})
-            if state.budget - entry_size < 0 and d:
+            if state.budget <= 0:
                 state.hit = True
-                dropped = total_keys - idx
                 d["_truncated"] = True
-                d["_dropped_items"] = dropped
+                d["_dropped_items"] = total_keys - idx
                 return d
-            state.budget -= entry_size
-            d[key] = trimmed
+            d[key] = _truncate_value(dict_value[key], state)
         return d
 
-    # Scalars (or anything else) – just account for size; do not trim mid-string.
-    state.budget -= _json_size(value)
+    # Oversized strings are truncated in place so the byte cap holds even when
+    # a single scalar exceeds the remaining budget.
+    if isinstance(value, str):
+        size = len(value.encode("utf-8"))
+        if size > state.budget:
+            state.hit = True
+            truncated = _truncate_bytes(value, max(0, state.budget))
+            state.budget -= len(truncated.encode("utf-8"))
+            return truncated
+        state.budget -= size
+        return value
+
+    # Other scalars (int/float/bool/None/…) are not splittable; account for
+    # their size and flag truncation if they push the budget negative.
+    size = _json_size(value)
+    if size > state.budget:
+        state.hit = True
+    state.budget -= size
     return value
 
 
-def _truncate_for_return(value: Any, max_bytes: int = MAX_RESULT_BYTES) -> Any:
-    """Return ``value`` trimmed so its JSON form fits in ``max_bytes``.
+def _truncate_for_return(
+    value: Any, max_bytes: int = MAX_RESULT_BYTES
+) -> tuple[Any, bool]:
+    """Return ``(trimmed, hit)`` where ``trimmed`` fits in ``max_bytes``.
 
-    If trimming was applied, the returned structure contains
-    ``{"_truncated": True, "_dropped_items": N}`` markers in place of the
-    overflow tail and the caller can detect this via the ``truncated`` flag on
-    the surrounding ``ExecResult``.
+    ``trimmed`` is ``value`` with oversized lists/dicts replaced past the
+    budget by ``{"_truncated": True, "_dropped_items": N}`` markers and
+    oversized strings cut at a unicode-safe boundary. ``hit`` is ``True`` iff
+    any truncation was applied; the caller surfaces it via the ``truncated``
+    flag on the surrounding ``ExecResult``.
     """
     state = _TruncationState(budget=int(max_bytes))
     trimmed = _truncate_value(value, state)

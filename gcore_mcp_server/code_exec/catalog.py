@@ -33,6 +33,9 @@ class ToolEntry:
     short_name: str
     doc_short: str
     doc_full: str
+    # `list[ParamInfo]` (not bare `list`) is intentional: it is callable and
+    # returns an empty list at runtime, while keeping pyright strict mode from
+    # reporting `params` as a partially-unknown type.
     params: list[ParamInfo] = field(default_factory=list[ParamInfo])
     toolset: str | None = None
     requires_project: bool = False

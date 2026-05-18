@@ -110,3 +110,31 @@ def test_truncate_for_return_nested():
         assert inner.get("_truncated") is True
         assert isinstance(inner.get("_dropped_items"), int)
         assert inner["_dropped_items"] >= 1
+
+
+def test_truncate_for_return_oversized_first_list_element():
+    """An oversized *first* element still flags truncation (Copilot review).
+
+    Regression: the old ``and out`` guard let a huge first element through
+    with the budget going negative and ``hit`` left False.
+    """
+    trimmed, hit = _truncate_for_return(["x" * 100_000, "tail"], max_bytes=5_000)
+
+    assert hit is True
+    assert isinstance(trimmed, list)
+    # The first element is truncated in place, not silently passed through.
+    assert len(str(trimmed[0]).encode("utf-8")) < 100_000
+
+
+def test_truncate_for_return_oversized_scalar_string():
+    """A bare oversized string is truncated and flags ``hit`` (Copilot review).
+
+    Regression: scalars used to only decrement the budget and were returned
+    unchanged, violating the byte cap and reporting ``truncated=False``.
+    """
+    trimmed, hit = _truncate_for_return("a" * 100_000, max_bytes=2_000)
+
+    assert hit is True
+    assert isinstance(trimmed, str)
+    assert len(trimmed.encode("utf-8")) < 100_000
+    assert "truncated" in trimmed
