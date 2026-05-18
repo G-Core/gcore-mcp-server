@@ -4,9 +4,27 @@
 
 MCP (Model Context Protocol) server for Gcore API. This server provides tools for interacting with Gcore Cloud API via LLM assistants.
 
+## Routing modes
+
+The server can present its capabilities to a client in two ways. Selected via the `GCORE_MCP_ROUTING` environment variable:
+
+| `GCORE_MCP_ROUTING` | Tool count | Description |
+| --- | --- | --- |
+| unset / `code_exec` | 3 | **Default.** Exposes `search_tools`, `get_tool_schema`, and `execute_code`. The LLM discovers and orchestrates ~700 SDK methods by writing short Python scripts that run in an embedded [Pydantic Monty](https://github.com/pydantic/monty) sandbox. Inside `execute_code` the model uses `await call_tool('cloud.<resource>.<method>', ...)`. Designed to keep the tool-list payload under any client's limit. |
+| `direct` | up to ~700 (filtered) | Legacy mode: each SDK method is registered as its own MCP tool, filtered by `GCORE_TOOLS`. Use this if your client already has a working configuration pinned to specific tool names. |
+
+The `code_exec` mode is the new default as of this release. To keep the legacy behavior, set `GCORE_MCP_ROUTING=direct`. In `code_exec` mode the `GCORE_TOOLS` variable is ignored — the catalog is searched dynamically from inside `execute_code()`.
+
+Sandbox capabilities (`execute_code`):
+
+- Supported: `async`/`await`, list/dict/set comprehensions, exceptions, stdlib `json` / `re` / `datetime`.
+- Not supported: `class`, `with`, `import`, `match`, generator functions/expressions.
+- Available inside the sandbox without imports: `await call_tool(name, **kwargs)`, `search_tools(query, limit=20)`, `get_tool_schema(name)`, plus the inputs `project_id` and `region_id` (pre-resolved when configured).
+- Defaults: 30 s wall-clock timeout, 200 MB memory cap, 40 KB result and stdout truncation.
+
 ## Usage
 
-**Note:** As we have multiple resources available, providing all of them at once to most LLM clients can overwhelm the model and lead to confusion among the tools. For most clients, it is recommended to specify only the necessary resources for your task to ensure optimal performance and clarity. Some clients, like Claude Code, handle this differently — see below.
+**Note:** The notes below apply to the legacy `direct` routing mode. In the default `code_exec` mode tool selection is automatic and `GCORE_TOOLS` is ignored.
 
 ### Integration with Cursor IDE
 
