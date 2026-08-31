@@ -117,6 +117,7 @@ The system includes several predefined toolsets for common workflows:
 - **`ai_ml`**: AI/ML inference services
 - **`billing`**: Cost reports and billing information
 - **`containers`**: Container registries
+- **`cdn`**: CDN resources, origin groups, certificates, and cache management
 - **`cleanup`**: Deletion and cleanup operations
 - **`list`**: List/read-only operations
 

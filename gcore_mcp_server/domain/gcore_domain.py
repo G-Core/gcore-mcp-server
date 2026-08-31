@@ -481,6 +481,43 @@ class GcoreDomainHandler:
                 "cloud.cost_reports.get_aggregated_monthly",
                 "cloud.cost_reports.get_detailed",
             ],
+            "cdn": [
+                # CDN Resources
+                "cdn.resources.list",
+                "cdn.resources.get",
+                "cdn.resources.create",
+                "cdn.resources.update",
+                "cdn.resources.replace",
+                "cdn.resources.delete",
+                "cdn.resources.purge",
+                "cdn.resources.prefetch",
+                "cdn.resources.rules.list",
+                "cdn.resources.rules.get",
+                "cdn.resources.rules.create",
+                "cdn.resources.rules.update",
+                "cdn.resources.rules.replace",
+                "cdn.resources.rules.delete",
+                # CDN Origin Groups
+                "cdn.origin_groups.list",
+                "cdn.origin_groups.get",
+                "cdn.origin_groups.create",
+                "cdn.origin_groups.update",
+                "cdn.origin_groups.replace",
+                "cdn.origin_groups.delete",
+                # CDN Certificates
+                "cdn.certificates.list",
+                "cdn.certificates.get",
+                "cdn.certificates.create",
+                "cdn.certificates.replace",
+                "cdn.certificates.renew",
+                "cdn.certificates.delete",
+                # CDN Shields & IP Ranges
+                "cdn.shields.list",
+                "cdn.ip_ranges.list",
+                # CDN Account
+                "cdn.get_account_overview",
+                "cdn.get_account_limits",
+            ],
         }
 
 
