@@ -10,6 +10,22 @@ logger = logging.getLogger(__name__)
 
 UNIFIED_TOOLS_ENV_VAR: Final[str] = "GCORE_TOOLS"
 MAX_TOOL_NAME_LEN: Final[int] = 60
+ALLOWED_HOSTS_ENV_VAR: Final[str] = "GCORE_ALLOWED_HOSTS"
+ALLOWED_ORIGINS_ENV_VAR: Final[str] = "GCORE_ALLOWED_ORIGINS"
+
+
+def get_allow_list(env_var: str) -> list[str] | None:
+    """Read a comma-separated allow-list, or None when the variable is unset.
+
+    Returning None rather than an empty list matters: FastMCP treats an
+    explicit list as "the operator configured this" and an absent one as
+    "use the defaults".
+    """
+    raw = os.getenv(env_var)
+    if raw is None:
+        return None
+    entries = [item.strip() for item in raw.split(",") if item.strip()]
+    return entries or None
 
 
 def get_shortening_rules() -> dict[str, str]:

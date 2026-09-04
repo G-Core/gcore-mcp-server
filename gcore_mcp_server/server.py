@@ -12,10 +12,13 @@ Gcore API → Model-Context-Protocol bridge (FastMCP v2)
     – "http"/"stream" …… streamable HTTP transport (suitable for remote)
   In HTTP mode the *management* tool-set is enabled by default unless
   `GCORE_TOOLS` is provided explicitly.
-• OAuth2/JWT will be added later.  `AuthSettings` is left commented for future
-  wiring.
+• In HTTP mode FastMCP's host/origin guard validates the Host and Origin
+  headers against allow-lists (`GCORE_ALLOWED_HOSTS` / `GCORE_ALLOWED_ORIGINS`),
+  as required by the MCP Streamable HTTP specification.  Client authentication
+  (OAuth2/JWT) is not implemented yet — do not expose the listener to an
+  untrusted network.
 
-Requires `fastmcp>=2.2` and the official «gcore» Python SDK.
+Requires `fastmcp>=4.0.2` and the official «gcore» Python SDK.
 """
 
 from __future__ import annotations
@@ -27,15 +30,18 @@ import os
 from typing import Any, Callable
 from functools import wraps
 from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7.1
-from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
+from fastmcp.tools import Tool  # type: ignore[import-not-found]
 from typing import get_type_hints, get_args, Union as TypingUnion
 from gcore import Gcore
 import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import (
+    ALLOWED_HOSTS_ENV_VAR,
+    ALLOWED_ORIGINS_ENV_VAR,
     UNIFIED_TOOLS_ENV_VAR,
     generate_short_tool_name,
+    get_allow_list,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
 from gcore_mcp_server.domain import (
@@ -283,6 +289,7 @@ def make_wrapper(
 # Environment – transport & tool-sets
 ###############################################################################
 
+
 _transport_raw = os.getenv("GCORE_TRANSPORT", "stdio").lower()
 
 # Map aliases → canonical FastMCP transport names
@@ -388,10 +395,20 @@ def main() -> None:
         mcp.run()
     else:
         port = int(os.getenv("GCORE_PORT", "8000"))
+        allowed_hosts = get_allow_list(ALLOWED_HOSTS_ENV_VAR)
+        allowed_origins = get_allow_list(ALLOWED_ORIGINS_ENV_VAR)
+        logger.info("HTTP transport allowed hosts: %s", allowed_hosts or "<loopback>")
+        logger.info("HTTP transport allowed origins: %s", allowed_origins or "<none>")
         mcp.run(
             transport=TRANSPORT,
             port=port,
             log_level="INFO",
+            # Validate Host and Origin on every request regardless of the bind
+            # address, so that exposing the listener requires an explicit
+            # allow-list rather than silently dropping the check.
+            host_origin_protection=True,
+            allowed_hosts=allowed_hosts,
+            allowed_origins=allowed_origins,
         )  # type: ignore[arg-type]
 
 

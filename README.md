@@ -59,6 +59,33 @@ The `uvx` command runs the server in a temporary environment without requiring a
 - `GCORE_CLOUD_PROJECT_ID`: "1",
 - `GCORE_CLOUD_REGION_ID`: "76",
 - `GCORE_CLIENT_ID`: "2",
+- `GCORE_ALLOWED_HOSTS`: "" (HTTP transport only; loopback is always allowed)
+- `GCORE_ALLOWED_ORIGINS`: "" (HTTP transport only)
+
+### HTTP transport security
+
+The HTTP transport (`GCORE_TRANSPORT=http`) validates the `Host` and `Origin`
+headers of every request, as required by the MCP Streamable HTTP specification.
+This prevents a web page the operator visits from reaching a listener bound to
+loopback via DNS rebinding.
+
+- `GCORE_ALLOWED_HOSTS` is a comma-separated allow-list of `Host` values,
+  matched as glob patterns (`mcp.internal:*`). Loopback names are always
+  accepted; set this when the server is reached under a different name. A
+  request with an unlisted `Host` is rejected with `421 Misdirected Request`.
+- `GCORE_ALLOWED_ORIGINS` is a comma-separated allow-list of `Origin` values,
+  also glob-matched. It is empty by default, so no third-party browser origin
+  is accepted. Requests without an `Origin` header — which is every non-browser
+  MCP client — are unaffected. A request with an unlisted `Origin` is rejected
+  with `403`.
+
+Validation is performed by FastMCP's host/origin guard, which this server
+enables unconditionally for the HTTP transport, so the check applies whatever
+address the listener is bound to.
+
+The HTTP transport does **not** authenticate clients: anyone who can reach the
+listener can call every enabled tool using the server's `GCORE_API_KEY`. Bind it
+to loopback and do not expose it to an untrusted network.
 
 ## Configuration
 
