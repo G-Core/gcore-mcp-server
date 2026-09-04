@@ -12,8 +12,10 @@ Gcore API → Model-Context-Protocol bridge (FastMCP v2)
     – "http"/"stream" …… streamable HTTP transport (suitable for remote)
   In HTTP mode the *management* tool-set is enabled by default unless
   `GCORE_TOOLS` is provided explicitly.
-• OAuth2/JWT will be added later.  `AuthSettings` is left commented for future
-  wiring.
+• In HTTP mode the listener validates the Host and Origin headers against
+  allow-lists (`GCORE_ALLOWED_HOSTS` / `GCORE_ALLOWED_ORIGINS`), as required by
+  the MCP Streamable HTTP specification.  Client authentication (OAuth2/JWT) is
+  not implemented yet — do not expose the listener to an untrusted network.
 
 Requires `fastmcp>=2.2` and the official «gcore» Python SDK.
 """
@@ -38,6 +40,7 @@ from gcore_mcp_server.config.settings import (
     generate_short_tool_name,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
+from gcore_mcp_server.http_security import build_http_middleware
 from gcore_mcp_server.domain import (
     MCP_PROJECT_REGION_INSTRUCTIONS,
     PROJECT_ID_TOOL_NOTE,
@@ -392,6 +395,7 @@ def main() -> None:
             transport=TRANSPORT,
             port=port,
             log_level="INFO",
+            middleware=build_http_middleware(),
         )  # type: ignore[arg-type]
 
 

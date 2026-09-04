@@ -59,6 +59,28 @@ The `uvx` command runs the server in a temporary environment without requiring a
 - `GCORE_CLOUD_PROJECT_ID`: "1",
 - `GCORE_CLOUD_REGION_ID`: "76",
 - `GCORE_CLIENT_ID`: "2",
+- `GCORE_ALLOWED_HOSTS`: "127.0.0.1:*,localhost:*,[::1]:*" (HTTP transport only)
+- `GCORE_ALLOWED_ORIGINS`: "" (HTTP transport only)
+
+### HTTP transport security
+
+The HTTP transport (`GCORE_TRANSPORT=http`) validates the `Host` and `Origin`
+headers of every request, as required by the MCP Streamable HTTP specification.
+This prevents a web page the operator visits from reaching a listener bound to
+loopback via DNS rebinding.
+
+- `GCORE_ALLOWED_HOSTS` is a comma-separated allow-list of `Host` values.
+  A trailing `:*` matches any port. Defaults to loopback only; set it when the
+  server is reached under a different name. A request with an unlisted `Host`
+  is rejected with `421 Misdirected Request`.
+- `GCORE_ALLOWED_ORIGINS` is a comma-separated allow-list of `Origin` values.
+  It is empty by default, meaning no browser origin is accepted. Requests
+  without an `Origin` header — which is every non-browser MCP client — are
+  unaffected. A request with an unlisted `Origin` is rejected with `403`.
+
+The HTTP transport does **not** authenticate clients: anyone who can reach the
+listener can call every enabled tool using the server's `GCORE_API_KEY`. Bind it
+to loopback and do not expose it to an untrusted network.
 
 ## Configuration
 
