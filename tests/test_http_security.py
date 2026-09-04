@@ -50,6 +50,16 @@ class TestHostValidation:
         response = client.post("/mcp", headers={"Host": "rebind.attacker.example"})
         assert response.status_code == 421
 
+    @pytest.mark.parametrize("host", ["Localhost:8000", "LOCALHOST:8000"])
+    def test_host_matching_is_case_insensitive(self, host: str):
+        """Hostnames are case-insensitive (RFC 3986 3.2.2)."""
+        client = _build_client({})
+        assert client.post("/mcp", headers={"Host": host}).status_code == 200
+
+    def test_configured_host_matching_is_case_insensitive(self):
+        client = _build_client({ALLOWED_HOSTS_ENV_VAR: "MCP.Internal:8000"})
+        assert client.post("/mcp", headers={"Host": "mcp.internal:8000"}).status_code == 200
+
     def test_allowlist_is_configurable(self):
         client = _build_client({ALLOWED_HOSTS_ENV_VAR: "mcp.internal:8000"})
         assert client.post("/mcp", headers={"Host": "mcp.internal:8000"}).status_code == 200
@@ -74,6 +84,15 @@ class TestOriginValidation:
 
     def test_allowlisted_origin_is_accepted(self):
         client = _build_client({ALLOWED_ORIGINS_ENV_VAR: "https://app.example.com"})
+        response = client.post(
+            "/mcp",
+            headers={"Host": "127.0.0.1:8000", "Origin": "https://app.example.com"},
+        )
+        assert response.status_code == 200
+
+    def test_origin_matching_is_case_insensitive(self):
+        """Scheme and host of an Origin are case-insensitive (RFC 3986 3.1, 3.2.2)."""
+        client = _build_client({ALLOWED_ORIGINS_ENV_VAR: "HTTPS://App.Example.com"})
         response = client.post(
             "/mcp",
             headers={"Host": "127.0.0.1:8000", "Origin": "https://app.example.com"},

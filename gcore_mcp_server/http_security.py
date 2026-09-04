@@ -19,10 +19,19 @@ ALLOWED_ORIGINS_ENV_VAR = "GCORE_ALLOWED_ORIGINS"
 
 
 def _split(raw: str | None) -> list[str]:
-    return [item.strip() for item in (raw or "").split(",") if item.strip()]
+    """Parse a comma-separated allow-list, normalized for case-insensitive use."""
+    return [item.strip().lower() for item in (raw or "").split(",") if item.strip()]
 
 
 def _matches(value: str, allowed: Sequence[str]) -> bool:
+    """Match a Host/Origin value against the allow-list.
+
+    Hostnames and URI schemes are case-insensitive (RFC 3986 §3.1, §3.2.2), and
+    neither a Host nor an Origin header carries a case-sensitive component, so
+    the whole value is compared lower-cased. Allow-list entries are already
+    normalized by `_split`. A trailing `:*` matches any port.
+    """
+    value = value.strip().lower()
     for pattern in allowed:
         if pattern == value:
             return True

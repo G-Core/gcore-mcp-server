@@ -427,6 +427,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
     { name = "gcore" },
+    { name = "starlette" },
 ]
 
 [package.optional-dependencies]
@@ -439,6 +440,7 @@ dev = [
 [package.dev-dependencies]
 dev = [
     { name = "build" },
+    { name = "httpx" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-anyio" },
@@ -452,12 +454,14 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-anyio", marker = "extra == 'dev'", specifier = ">=0.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "starlette", specifier = ">=0.47.2" },
 ]
 provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "pyright", specifier = ">=1.1.397" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-anyio", specifier = ">=0.0.0" },
