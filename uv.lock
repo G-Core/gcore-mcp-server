@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 
 [[package]]
@@ -405,7 +405,7 @@ wheels = [
 
 [[package]]
 name = "gcore"
-version = "0.15.0"
+version = "0.55.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -415,9 +415,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/13/b7/4ffd7d60a7ac275683e404e617d9c9cdd3fc2fdb9adde4acfe3b75f4c3d3/gcore-0.15.0.tar.gz", hash = "sha256:7d4012ce96a6f80af93261ab2b0673551b8dd888cafba5c04dfb84a5bfb17dea", size = 886727, upload-time = "2025-10-03T07:47:41.87Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/a3/110e6695ef91047d880f9b26435c6f0e03c005a1197338d367d736e8cb1a/gcore-0.55.0.tar.gz", hash = "sha256:8591cf06a36d8d5415e0c5c61a08a5a68e0c4fe4b717d02db8e5f4306660d998", size = 1119770, upload-time = "2026-08-05T17:07:41.071Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c7/84/e88ab27f35ba62b3eb74cc6c81ecbb807237ac55d93c471bbd0480255ab7/gcore-0.15.0-py3-none-any.whl", hash = "sha256:f8bae20e3a260b81b8a5972b94d7debe8d62e40b3d9a40f2c8fb35f83c5a23c6", size = 1298455, upload-time = "2025-10-03T07:47:40.655Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/89/9cfc24fba1fe1b07de88d7327e31d1254d2da53527f74c92c15e932e772b/gcore-0.55.0-py3-none-any.whl", hash = "sha256:911a04cb4c1fcbd325fc418cb63cf0840ac2507809cff5702eb0ecd672880e0f", size = 1617906, upload-time = "2026-08-05T17:07:39.607Z" },
 ]
 
 [[package]]
@@ -447,8 +447,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastmcp", specifier = ">=2.12.0" },
-    { name = "gcore", specifier = ">=0.15,<1" },
+    { name = "fastmcp", specifier = ">=2.12.0,<3" },
+    { name = "gcore", specifier = ">=0.55,<1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-anyio", marker = "extra == 'dev'", specifier = ">=0.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },

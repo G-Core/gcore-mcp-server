@@ -35,7 +35,6 @@ def _inspect_recursive(
         "region_id",
         "with_raw_response",
         "with_streaming_response",
-        "copy",
         "model_copy",
     ]
 

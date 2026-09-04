@@ -44,7 +44,6 @@ def get_shortening_rules() -> dict[str, str]:
         "resize": "resz",
         "get_console": "get_con",
         "action": "act",
-        "list_suitable": "ls_suit",
         "list_for_resize": "ls_resz",
         "attach": "att",
         "detach": "det",
@@ -68,7 +67,6 @@ def get_shortening_rules() -> dict[str, str]:
         "acknowledge_all": "ack_all",
         "acknowledge_one": "ack_one",
         "upload_tls_certificate": "upl_tls_cert",
-        "get_api_key": "get_apikey",
     }
 
     rules.update(additional_rules)
