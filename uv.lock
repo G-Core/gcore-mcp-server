@@ -621,6 +621,7 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-anyio" },
     { name = "ruff" },
@@ -640,6 +641,7 @@ dev = [
 requires-dist = [
     { name = "fastmcp", specifier = ">=4.0.2,<5" },
     { name = "gcore", specifier = ">=0.55,<1" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-anyio", marker = "extra == 'dev'", specifier = ">=0.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },

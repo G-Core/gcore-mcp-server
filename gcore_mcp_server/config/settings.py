@@ -15,8 +15,10 @@ ALLOWED_ORIGINS_ENV_VAR: Final[str] = "GCORE_ALLOWED_ORIGINS"
 
 
 def get_allow_list(env_var: str) -> list[str] | None:
-    """Read a comma-separated allow-list, or None when the variable is unset.
+    """Read a comma-separated allow-list from the environment.
 
+    Returns None when the variable is unset, empty, or contains only
+    whitespace and separators, so that all three mean "not configured".
     Returning None rather than an empty list matters: FastMCP treats an
     explicit list as "the operator configured this" and an absent one as
     "use the defaults".

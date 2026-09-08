@@ -35,7 +35,11 @@ HEADERS = {
 
 
 def _client(allowed_hosts=None, allowed_origins=None) -> TestClient:
-    """Build the HTTP app the way `main()` does, and drive it over ASGI."""
+    """Build the HTTP app with the guard configuration `main()` passes to `mcp.run()`.
+
+    `main()` runs the app under uvicorn; here the same app is driven in-process
+    over ASGI so the tests exercise the real guard without a network listener.
+    """
     mcp = FastMCP(name="test-server")
 
     @mcp.tool
