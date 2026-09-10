@@ -14,7 +14,7 @@ from gcore_mcp_server.core.inspection import (
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import generate_short_tool_name
 from gcore_mcp_server.server import make_wrapper
-from fastmcp.tools.tool import Tool
+from fastmcp.tools import Tool
 
 
 class TestE2ESmoke:
@@ -320,7 +320,7 @@ class TestE2ESmoke:
         # Create FastMCP tool and check schema
         tool = Tool.from_function(wrapper, name="test_cost_reports", description="Test")
         mcp_tool = tool.to_mcp_tool()
-        schema = mcp_tool.model_dump()
+        schema = mcp_tool.model_dump(by_alias=True)
 
         # Verify projects parameter schema
         projects_schema = schema["inputSchema"]["properties"]["projects"]

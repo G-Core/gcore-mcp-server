@@ -59,6 +59,44 @@ The `uvx` command runs the server in a temporary environment without requiring a
 - `GCORE_CLOUD_PROJECT_ID`: "1",
 - `GCORE_CLOUD_REGION_ID`: "76",
 - `GCORE_CLIENT_ID`: "2",
+- `GCORE_ALLOWED_HOSTS`: "" (HTTP transport only; loopback names always allowed)
+- `GCORE_ALLOWED_ORIGINS`: "" (HTTP transport only)
+
+### HTTP transport security
+
+The HTTP transport (`GCORE_TRANSPORT=http`) validates the `Host` and `Origin`
+headers of every request, as required by the MCP Streamable HTTP specification.
+This prevents a web page the operator visits from reaching a listener bound to
+loopback via DNS rebinding.
+
+- `GCORE_ALLOWED_HOSTS` is a comma-separated list of additional host names,
+  matched as glob patterns. Ports are ignored on both sides, so list host
+  names only (`mcp.internal`, not `mcp.internal:8000`). The built-in names
+  `127.0.0.1`, `localhost` and `::1`, plus the concrete address the listener
+  is bound to, are always accepted. Any other `Host` is rejected with
+  `421 Misdirected Request`.
+- `GCORE_ALLOWED_ORIGINS` is a comma-separated list of additional browser
+  origins, also glob-matched. On top of it FastMCP always accepts an `Origin`
+  equal to the request's own origin, and any loopback origin when the `Host`
+  is loopback — so another web app running on your machine is trusted, a
+  DNS-rebound page on an attacker's domain is not. Any other `Origin` is
+  rejected with `403`. Requests without an `Origin` header (typical for
+  non-browser MCP clients) are unaffected. Known FastMCP limitation: an
+  IPv6 literal origin such as `http://[::1]:3000` cannot be allow-listed,
+  because the brackets are read as glob syntax.
+
+Validation is FastMCP's host/origin guard in strict mode, which this server
+turns on for the HTTP transport regardless of the bind address. Only the
+`gcore-mcp-server` entry point applies this policy; loading the module's `mcp`
+object through another runner (such as `fastmcp run …:mcp`) does not.
+
+The legacy SSE transport is not supported and `GCORE_TRANSPORT=sse` refuses to
+start: FastMCP does not apply this validation to its SSE app, so an SSE listener
+would run without it.
+
+The HTTP transport does **not** authenticate clients: anyone who can reach the
+listener can call every enabled tool using the server's `GCORE_API_KEY`. Bind it
+to loopback and do not expose it to an untrusted network.
 
 ## Configuration
 

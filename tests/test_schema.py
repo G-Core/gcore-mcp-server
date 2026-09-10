@@ -107,7 +107,7 @@ class TestE2ESchemaGeneration:
 
     def test_basic_types_schema_generation(self):
         """Test that basic types generate correct schemas through FastMCP."""
-        from fastmcp.tools.tool import Tool
+        from fastmcp.tools import Tool
         from typing import Any
 
         async def test_func(
@@ -120,7 +120,7 @@ class TestE2ESchemaGeneration:
             pass
 
         tool = Tool.from_function(test_func, name="test", description="Test")
-        schema = tool.to_mcp_tool().model_dump()
+        schema = tool.to_mcp_tool().model_dump(by_alias=True)
         props = schema["inputSchema"]["properties"]
 
         # Verify basic types
@@ -133,7 +133,7 @@ class TestE2ESchemaGeneration:
 
     def test_array_schema_generation(self):
         """Test that list types generate correct array schemas."""
-        from fastmcp.tools.tool import Tool
+        from fastmcp.tools import Tool
         from typing import Any, List
 
         async def test_func(items: List[str]) -> Any:
@@ -141,7 +141,7 @@ class TestE2ESchemaGeneration:
             pass
 
         tool = Tool.from_function(test_func, name="test", description="Test")
-        schema = tool.to_mcp_tool().model_dump()
+        schema = tool.to_mcp_tool().model_dump(by_alias=True)
         props = schema["inputSchema"]["properties"]
 
         assert props["items"]["type"] == "array"
@@ -149,7 +149,7 @@ class TestE2ESchemaGeneration:
 
     def test_union_schema_generation(self):
         """Test that Union types generate correct schemas."""
-        from fastmcp.tools.tool import Tool
+        from fastmcp.tools import Tool
         from typing import Any, Union
 
         async def test_func(param: Union[str, int]) -> Any:
@@ -157,14 +157,14 @@ class TestE2ESchemaGeneration:
             pass
 
         tool = Tool.from_function(test_func, name="test", description="Test")
-        schema = tool.to_mcp_tool().model_dump()
+        schema = tool.to_mcp_tool().model_dump(by_alias=True)
         props = schema["inputSchema"]["properties"]
 
         assert "anyOf" in props["param"]
 
     def test_literal_schema_generation(self):
         """Test that Literal types generate correct enum schemas."""
-        from fastmcp.tools.tool import Tool
+        from fastmcp.tools import Tool
         from typing import Any, Literal
 
         async def test_func(size: Literal["small", "medium", "large"]) -> Any:
@@ -172,7 +172,7 @@ class TestE2ESchemaGeneration:
             pass
 
         tool = Tool.from_function(test_func, name="test", description="Test")
-        schema = tool.to_mcp_tool().model_dump()
+        schema = tool.to_mcp_tool().model_dump(by_alias=True)
         props = schema["inputSchema"]["properties"]
 
         assert props["size"]["enum"] == ["small", "medium", "large"]

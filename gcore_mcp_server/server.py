@@ -1,6 +1,6 @@
 # server_fastmcp.py
 """
-Gcore API → Model-Context-Protocol bridge (FastMCP v2)
+Gcore API → Model-Context-Protocol bridge (FastMCP v4)
 -------------------------------------------------------------
 • Dynamically inspects the public SDK, auto-wraps every method and exposes it
   as an MCP *tool*.
@@ -10,12 +10,17 @@ Gcore API → Model-Context-Protocol bridge (FastMCP v2)
 • The server runs in two transport modes, selected through `GCORE_TRANSPORT`:
     – "stdio" (default) …… basic stdio transport (ideal for local LLMs)
     – "http"/"stream" …… streamable HTTP transport (suitable for remote)
+  The legacy SSE transport is refused at startup: FastMCP does not apply its
+  Host/Origin guard to the SSE app, so it would run unprotected.
   In HTTP mode the *management* tool-set is enabled by default unless
   `GCORE_TOOLS` is provided explicitly.
-• OAuth2/JWT will be added later.  `AuthSettings` is left commented for future
-  wiring.
+• In HTTP mode FastMCP's host/origin guard validates the Host and Origin
+  headers against allow-lists (`GCORE_ALLOWED_HOSTS` / `GCORE_ALLOWED_ORIGINS`),
+  as required by the MCP Streamable HTTP specification.  Client authentication
+  (OAuth2/JWT) is not implemented yet — do not expose the listener to an
+  untrusted network.
 
-Requires `fastmcp>=2.2` and the official «gcore» Python SDK.
+Requires `fastmcp>=4.0.2` and the official «gcore» Python SDK.
 """
 
 from __future__ import annotations
@@ -26,16 +31,21 @@ import logging
 import os
 from typing import Any, Callable
 from functools import wraps
-from fastmcp import FastMCP  # type: ignore[import-not-found]  # FastMCP ≥ 2.7.1
-from fastmcp.tools.tool import Tool  # type: ignore[import-not-found]
+from fastmcp import FastMCP  # type: ignore[import-not-found]
+from fastmcp.tools import Tool  # type: ignore[import-not-found]
 from typing import get_type_hints, get_args, Union as TypingUnion
 from gcore import Gcore
 import gcore
 from gcore_mcp_server.core.inspection import iter_sdk_methods
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import (
+    ALLOWED_HOSTS_ENV_VAR,
+    ALLOWED_ORIGINS_ENV_VAR,
+    TRANSPORT_ENV_VAR,
     UNIFIED_TOOLS_ENV_VAR,
     generate_short_tool_name,
+    get_allow_list,
+    resolve_transport,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
 from gcore_mcp_server.domain import (
@@ -283,22 +293,16 @@ def make_wrapper(
 # Environment – transport & tool-sets
 ###############################################################################
 
-_transport_raw = os.getenv("GCORE_TRANSPORT", "stdio").lower()
 
-# Map aliases → canonical FastMCP transport names
-_TRANSPORT_MAP: dict[str, str] = {
-    "stdio": "stdio",
-    "http": "streamable-http",
-    "stream": "streamable-http",
-    "streamable-http": "streamable-http",
-    "sse": "sse",
-}
-
-TRANSPORT: str = _TRANSPORT_MAP.get(_transport_raw, "stdio")
-if _transport_raw not in _TRANSPORT_MAP:
-    logger.warning(
-        "Unknown GCORE_TRANSPORT '%s', falling back to 'stdio'", _transport_raw
-    )
+# Resolve the transport at import so the tool-set default below can depend on
+# it, but defer rejecting an unsupported one to main(): importing this module
+# (tests, tooling, `fastmcp inspect`) must not terminate the process.
+TRANSPORT_ERROR: ValueError | None = None
+try:
+    TRANSPORT: str = resolve_transport(os.getenv(TRANSPORT_ENV_VAR))
+except ValueError as exc:
+    TRANSPORT_ERROR = exc
+    TRANSPORT = "stdio"
 
 # In HTTP mode enable *management* tools by default (unless explicitly set).
 if TRANSPORT != "stdio" and not os.getenv(UNIFIED_TOOLS_ENV_VAR):
@@ -383,16 +387,49 @@ if failed_registrations:
 
 
 def main() -> None:
-    """Entry point for console script."""
+    """Entry point for console script.
+
+    This is the only launch path that applies the transport policy below.
+    Loading the module's `mcp` object through another runner (for example
+    `fastmcp run gcore_mcp_server/server.py:mcp`) bypasses it.
+    """
+    if TRANSPORT_ERROR is not None:
+        logger.error("%s", TRANSPORT_ERROR)
+        raise SystemExit(2)
+
     if TRANSPORT == "stdio":
-        mcp.run()
-    else:
-        port = int(os.getenv("GCORE_PORT", "8000"))
-        mcp.run(
-            transport=TRANSPORT,
-            port=port,
-            log_level="INFO",
-        )  # type: ignore[arg-type]
+        # Always name the transport. A bare `mcp.run()` lets FastMCP pick one
+        # from its own settings (FASTMCP_TRANSPORT / .env), which could start
+        # an HTTP or SSE listener without any of the protection below.
+        mcp.run(transport="stdio")
+        return
+
+    port = int(os.getenv("GCORE_PORT", "8000"))
+    allowed_hosts = get_allow_list(ALLOWED_HOSTS_ENV_VAR)
+    allowed_origins = get_allow_list(ALLOWED_ORIGINS_ENV_VAR)
+    logger.info(
+        "HTTP transport extra allowed hosts: %s (built-in loopback names and the "
+        "bound address are always accepted)",
+        allowed_hosts or "none",
+    )
+    logger.info(
+        "HTTP transport allowed origins: %s (same-origin and loopback origins "
+        "are always accepted)",
+        allowed_origins or "none",
+    )
+    mcp.run(
+        transport=TRANSPORT,
+        port=port,
+        log_level="INFO",
+        # Strict mode validates Host and Origin on every request regardless of
+        # the bind address ("auto" would skip Host checks on a non-loopback
+        # bind). The lists are always passed explicitly, even when empty, so
+        # FastMCP's own FASTMCP_HTTP_ALLOWED_* settings cannot widen the policy
+        # behind the GCORE_* variables documented in the README.
+        host_origin_protection=True,
+        allowed_hosts=allowed_hosts,
+        allowed_origins=allowed_origins,
+    )  # type: ignore[arg-type]
 
 
 if __name__ == "__main__":
