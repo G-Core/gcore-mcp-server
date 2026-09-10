@@ -52,20 +52,16 @@ def resolve_transport(raw: str | None) -> str:
     return TRANSPORT_MAP[value]
 
 
-def get_allow_list(env_var: str) -> list[str] | None:
+def get_allow_list(env_var: str) -> list[str]:
     """Read a comma-separated allow-list from the environment.
 
-    Returns None when the variable is unset, empty, or contains only
-    whitespace and separators, so that all three mean "not configured".
-    Returning None rather than an empty list matters: FastMCP treats an
-    explicit list as "the operator configured this" and an absent one as
-    "use the defaults".
+    Unset, empty and whitespace-only values all yield an empty list. The list
+    is always passed to FastMCP explicitly: passing None would make it fall
+    back to its own FASTMCP_HTTP_ALLOWED_* settings, a second configuration
+    channel the README does not document.
     """
-    raw = os.getenv(env_var)
-    if raw is None:
-        return None
-    entries = [item.strip() for item in raw.split(",") if item.strip()]
-    return entries or None
+    raw = os.getenv(env_var) or ""
+    return [item.strip() for item in raw.split(",") if item.strip()]
 
 
 def get_shortening_rules() -> dict[str, str]:

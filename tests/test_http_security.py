@@ -66,14 +66,15 @@ def _post(client: TestClient, extra: dict[str, str]) -> int:
 class TestAllowListParsing:
     """`GCORE_ALLOWED_*` parsing, which is what this server contributes."""
 
-    def test_unset_variable_is_none(self):
+    def test_unset_variable_is_empty_list(self):
+        """Never None: None would let FastMCP substitute its own FASTMCP_HTTP_ALLOWED_* settings."""
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop(ALLOWED_HOSTS_ENV_VAR, None)
-            assert get_allow_list(ALLOWED_HOSTS_ENV_VAR) is None
+            assert get_allow_list(ALLOWED_HOSTS_ENV_VAR) == []
 
-    def test_empty_variable_is_none(self):
+    def test_empty_variable_is_empty_list(self):
         with patch.dict(os.environ, {ALLOWED_ORIGINS_ENV_VAR: "  "}):
-            assert get_allow_list(ALLOWED_ORIGINS_ENV_VAR) is None
+            assert get_allow_list(ALLOWED_ORIGINS_ENV_VAR) == []
 
     def test_entries_are_split_and_stripped(self):
         with patch.dict(os.environ, {ALLOWED_HOSTS_ENV_VAR: " a:8000 , b:8000 ,"}):
@@ -190,7 +191,81 @@ class TestSseIsUnguardedUpstream:
                 headers=headers,
             ).status_code
 
-        assert status not in (403, 421), (
-            "FastMCP now rejects rebinding headers on the SSE app; "
-            "the SSE refusal in resolve_transport can be revisited."
+        # 404 is the SDK's "Could not find session" answer, produced by the
+        # SSE transport itself -- i.e. the request went past where a guard
+        # would sit. 421/403 would mean FastMCP now guards SSE; anything else
+        # means the probe no longer reaches the transport.
+        assert status == 404, (
+            f"expected the SSE transport's 404 for an unknown session, got {status}; "
+            "if it is 421/403, FastMCP now guards SSE and the refusal in "
+            "resolve_transport can be revisited."
         )
+
+
+class TestMainWiring:
+    """Exercise `main()` itself, so the guard cannot be dropped from the real
+    launch path while the middleware tests above stay green."""
+
+    @staticmethod
+    def _load_server(env: dict[str, str]):
+        """Import (or reload) the server module under the given environment.
+
+        The transport is resolved at import time, so each case needs a fresh
+        module. `patch.dict` restores the environment afterwards, including the
+        GCORE_TOOLS default the module sets in HTTP mode.
+        """
+        import importlib
+
+        for var in ("GCORE_TRANSPORT", "FASTMCP_TRANSPORT", "GCORE_TOOLS",
+                    ALLOWED_HOSTS_ENV_VAR, ALLOWED_ORIGINS_ENV_VAR):
+            os.environ.pop(var, None)
+        os.environ.update(env)
+        import gcore_mcp_server.server as server
+
+        return importlib.reload(server)
+
+    def test_stdio_names_its_transport_explicitly(self):
+        """Regression for the FASTMCP_TRANSPORT bypass: a bare `mcp.run()` would
+        let FastMCP start an HTTP/SSE listener from its own settings."""
+        with patch.dict(os.environ, {}, clear=False):
+            server = self._load_server({"FASTMCP_TRANSPORT": "sse"})
+            with patch.object(server.mcp, "run") as run:
+                server.main()
+        run.assert_called_once()
+        assert run.call_args.kwargs.get("transport") == "stdio"
+
+    def test_http_passes_strict_guard_and_explicit_lists(self):
+        with patch.dict(os.environ, {}, clear=False):
+            server = self._load_server({"GCORE_TRANSPORT": "http"})
+            with patch.object(server.mcp, "run") as run:
+                server.main()
+        kwargs = run.call_args.kwargs
+        assert kwargs["transport"] == "streamable-http"
+        assert kwargs["host_origin_protection"] is True
+        # Explicit empty lists, never None (see get_allow_list).
+        assert kwargs["allowed_hosts"] == []
+        assert kwargs["allowed_origins"] == []
+
+    def test_http_forwards_configured_lists(self):
+        with patch.dict(os.environ, {}, clear=False):
+            server = self._load_server({
+                "GCORE_TRANSPORT": "http",
+                ALLOWED_HOSTS_ENV_VAR: "mcp.internal",
+                ALLOWED_ORIGINS_ENV_VAR: "https://app.example.com, https://b.example.com",
+            })
+            with patch.object(server.mcp, "run") as run:
+                server.main()
+        kwargs = run.call_args.kwargs
+        assert kwargs["allowed_hosts"] == ["mcp.internal"]
+        assert kwargs["allowed_origins"] == ["https://app.example.com", "https://b.example.com"]
+
+    def test_sse_imports_cleanly_but_refuses_to_run(self):
+        """Importing must not kill the process (tests, tooling); only main() exits."""
+        with patch.dict(os.environ, {}, clear=False):
+            server = self._load_server({"GCORE_TRANSPORT": "sse"})
+            assert server.TRANSPORT_ERROR is not None
+            with patch.object(server.mcp, "run") as run:
+                with pytest.raises(SystemExit) as exc:
+                    server.main()
+        assert exc.value.code == 2
+        run.assert_not_called()
