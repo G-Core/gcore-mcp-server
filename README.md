@@ -83,6 +83,10 @@ Validation is performed by FastMCP's host/origin guard, which this server
 enables unconditionally for the HTTP transport, so the check applies whatever
 address the listener is bound to.
 
+The legacy SSE transport is not supported and `GCORE_TRANSPORT=sse` refuses to
+start: FastMCP does not apply this validation to its SSE app, so an SSE listener
+would run without it.
+
 The HTTP transport does **not** authenticate clients: anyone who can reach the
 listener can call every enabled tool using the server's `GCORE_API_KEY`. Bind it
 to loopback and do not expose it to an untrusted network.

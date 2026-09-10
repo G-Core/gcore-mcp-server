@@ -14,6 +14,44 @@ ALLOWED_HOSTS_ENV_VAR: Final[str] = "GCORE_ALLOWED_HOSTS"
 ALLOWED_ORIGINS_ENV_VAR: Final[str] = "GCORE_ALLOWED_ORIGINS"
 
 
+TRANSPORT_ENV_VAR: Final[str] = "GCORE_TRANSPORT"
+
+# Map aliases → canonical FastMCP transport names.
+TRANSPORT_MAP: Final[dict[str, str]] = {
+    "stdio": "stdio",
+    "http": "streamable-http",
+    "stream": "streamable-http",
+    "streamable-http": "streamable-http",
+}
+
+# Transports this server refuses to run, with the reason shown to the operator.
+# SSE is rejected rather than merely unmapped so it cannot silently fall back
+# to stdio: FastMCP does not apply its Host/Origin guard to the SSE app, so an
+# SSE listener would run without the DNS-rebinding protection the HTTP
+# transport has.
+UNSUPPORTED_TRANSPORTS: Final[dict[str, str]] = {
+    "sse": (
+        "the SSE transport is not supported: FastMCP does not apply Host/Origin "
+        "validation to it. Use GCORE_TRANSPORT=http instead."
+    ),
+}
+
+
+def resolve_transport(raw: str | None) -> str:
+    """Resolve a GCORE_TRANSPORT value to a canonical FastMCP transport name.
+
+    Unknown values fall back to "stdio" with a warning. Values listed in
+    UNSUPPORTED_TRANSPORTS raise ValueError so the process fails to start.
+    """
+    value = (raw or "stdio").strip().lower()
+    if value in UNSUPPORTED_TRANSPORTS:
+        raise ValueError(f"GCORE_TRANSPORT={value!r}: {UNSUPPORTED_TRANSPORTS[value]}")
+    if value not in TRANSPORT_MAP:
+        logger.warning("Unknown GCORE_TRANSPORT '%s', falling back to 'stdio'", value)
+        return "stdio"
+    return TRANSPORT_MAP[value]
+
+
 def get_allow_list(env_var: str) -> list[str] | None:
     """Read a comma-separated allow-list from the environment.
 

@@ -10,6 +10,8 @@ Gcore API → Model-Context-Protocol bridge (FastMCP v2)
 • The server runs in two transport modes, selected through `GCORE_TRANSPORT`:
     – "stdio" (default) …… basic stdio transport (ideal for local LLMs)
     – "http"/"stream" …… streamable HTTP transport (suitable for remote)
+  The legacy SSE transport is refused at startup: FastMCP does not apply its
+  Host/Origin guard to the SSE app, so it would run unprotected.
   In HTTP mode the *management* tool-set is enabled by default unless
   `GCORE_TOOLS` is provided explicitly.
 • In HTTP mode FastMCP's host/origin guard validates the Host and Origin
@@ -39,9 +41,11 @@ from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 from gcore_mcp_server.config.settings import (
     ALLOWED_HOSTS_ENV_VAR,
     ALLOWED_ORIGINS_ENV_VAR,
+    TRANSPORT_ENV_VAR,
     UNIFIED_TOOLS_ENV_VAR,
     generate_short_tool_name,
     get_allow_list,
+    resolve_transport,
 )
 from gcore_mcp_server.config.toolsets import get_allowed_tools_list
 from gcore_mcp_server.domain import (
@@ -290,22 +294,11 @@ def make_wrapper(
 ###############################################################################
 
 
-_transport_raw = os.getenv("GCORE_TRANSPORT", "stdio").lower()
-
-# Map aliases → canonical FastMCP transport names
-_TRANSPORT_MAP: dict[str, str] = {
-    "stdio": "stdio",
-    "http": "streamable-http",
-    "stream": "streamable-http",
-    "streamable-http": "streamable-http",
-    "sse": "sse",
-}
-
-TRANSPORT: str = _TRANSPORT_MAP.get(_transport_raw, "stdio")
-if _transport_raw not in _TRANSPORT_MAP:
-    logger.warning(
-        "Unknown GCORE_TRANSPORT '%s', falling back to 'stdio'", _transport_raw
-    )
+try:
+    TRANSPORT: str = resolve_transport(os.getenv(TRANSPORT_ENV_VAR))
+except ValueError as exc:
+    logger.error("%s", exc)
+    raise SystemExit(2) from exc
 
 # In HTTP mode enable *management* tools by default (unless explicitly set).
 if TRANSPORT != "stdio" and not os.getenv(UNIFIED_TOOLS_ENV_VAR):

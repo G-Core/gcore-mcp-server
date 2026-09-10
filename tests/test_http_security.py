@@ -16,6 +16,7 @@ from gcore_mcp_server.config.settings import (
     ALLOWED_HOSTS_ENV_VAR,
     ALLOWED_ORIGINS_ENV_VAR,
     get_allow_list,
+    resolve_transport,
 )
 
 INIT = {
@@ -126,3 +127,70 @@ class TestOriginValidation:
             {"Host": "rebind.attacker.example", "Origin": "https://evil.example"},
         )
         assert status == 421
+
+
+class TestTransportSelection:
+    """`GCORE_TRANSPORT` resolution, including the transports we refuse."""
+
+    @pytest.mark.parametrize(
+        ("raw", "expected"),
+        [
+            (None, "stdio"),
+            ("stdio", "stdio"),
+            ("http", "streamable-http"),
+            ("HTTP", "streamable-http"),
+            ("stream", "streamable-http"),
+            ("streamable-http", "streamable-http"),
+        ],
+    )
+    def test_known_values_resolve(self, raw, expected):
+        assert resolve_transport(raw) == expected
+
+    def test_unknown_value_falls_back_to_stdio(self):
+        assert resolve_transport("carrier-pigeon") == "stdio"
+
+    @pytest.mark.parametrize("raw", ["sse", "SSE", " sse "])
+    def test_sse_is_refused(self, raw):
+        """Regression: SSE must fail to start, not fall back or run unguarded."""
+        with pytest.raises(ValueError, match="SSE transport is not supported"):
+            resolve_transport(raw)
+
+
+class TestSseIsUnguardedUpstream:
+    """Documents *why* SSE is refused.
+
+    FastMCP only installs `HostOriginGuardMiddleware` in its streamable-HTTP
+    app; the SSE app ignores `host_origin_protection` and the allow-lists.
+    This test pins that fact. If it ever fails, FastMCP has started guarding
+    SSE and the refusal in `resolve_transport` can be reconsidered.
+    """
+
+    def test_sse_app_accepts_rebinding_headers(self):
+        mcp = FastMCP(name="test-server")
+
+        @mcp.tool
+        def ping() -> str:
+            """Stand-in for a Gcore tool."""
+            return "pong"
+
+        app = mcp.http_app(
+            transport="sse",
+            host_origin_protection=True,
+            allowed_hosts=None,
+            allowed_origins=None,
+        )
+        # The guard, when installed, wraps the whole app, so a POST to the SSE
+        # message endpoint is enough to observe it -- and unlike GET /sse it
+        # returns immediately rather than holding an event stream open.
+        headers = {"Host": "rebind.attacker.example", "Origin": "https://evil.example"}
+        with TestClient(app, base_url="http://127.0.0.1:8000") as client:
+            status = client.post(
+                "/messages/?session_id=00000000000000000000000000000000",
+                json={"jsonrpc": "2.0", "method": "ping", "id": 1},
+                headers=headers,
+            ).status_code
+
+        assert status not in (403, 421), (
+            "FastMCP now rejects rebinding headers on the SSE app; "
+            "the SSE refusal in resolve_transport can be revisited."
+        )
