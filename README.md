@@ -4,6 +4,8 @@
 
 MCP (Model Context Protocol) server for Gcore API. This server provides tools for interacting with Gcore Cloud API via LLM assistants.
 
+Install [`uv` 0.13.5 or later](https://docs.astral.sh/uv/getting-started/installation/) before using the `uv` or `uvx` commands below.
+
 ## Usage
 
 **Note:** As we have multiple resources available, providing all of them at once to most LLM clients can overwhelm the model and lead to confusion among the tools. For most clients, it is recommended to specify only the necessary resources for your task to ensure optimal performance and clarity. Some clients, like Claude Code, handle this differently — see below.
