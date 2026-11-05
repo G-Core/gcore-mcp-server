@@ -7,8 +7,10 @@ Rules:
 
 - The version never goes below the latest ``vX.Y.Z`` tag.
 - A pull request that changes the server (``gcore_mcp_server/`` or
-  ``pyproject.toml``) must raise it above the latest tag: merging it releases
-  that version. Docs- and tests-only changes may keep it.
+  ``pyproject.toml``) must raise it above the latest tag and above the version
+  on its base branch: merging it releases that version. The base check catches
+  two PRs that bump to the same version, when the first is merged but not yet
+  tagged. Docs- and tests-only changes may keep it.
 - A version above the latest tag needs its ``## [X.Y.Z]`` section in
   CHANGELOG.md, which becomes the release notes.
 
@@ -36,8 +38,9 @@ def _git(*args: str) -> str:
     ).stdout
 
 
-def project_version() -> Version:
-    text = (ROOT / "pyproject.toml").read_text()
+def project_version(text: str | None = None) -> Version:
+    if text is None:
+        text = (ROOT / "pyproject.toml").read_text()
     found = re.search(r'^version = "([^"]+)"', text, re.M)
     if not found:
         raise SystemExit("pyproject.toml has no version")
@@ -69,11 +72,24 @@ def decide(
     latest: Version | None,
     server_changed: bool,
     changelog: str,
+    base: Version | None = None,
 ) -> tuple[bool, str | None]:
-    """``(release, error)``: whether this version is new, and what's wrong."""
+    """``(release, error)``: whether this version is new, and what's wrong.
+
+    ``base`` is the version on the pull request's base branch, if any.
+    """
     if latest is not None and version < latest:
         return False, f"version {version} is below the latest release v{latest}"
+    if base is not None and version < base:
+        return False, f"version {version} is below {base} on the base branch"
     release = latest is None or version > latest
+    if server_changed and base is not None and latest is not None and base > latest:
+        if version == base:
+            return False, (
+                f"{base} is already on the base branch (merged, not yet released), "
+                "so raise the version above it in pyproject.toml and rename your "
+                "CHANGELOG.md section"
+            )
     if server_changed and not release:
         return False, (
             f"this changes the server, so raise the version above v{latest} in "
@@ -98,10 +114,16 @@ def main(argv: list[str] | None = None) -> int:
     version = project_version()
     latest = latest_release(_git("tag", "--list", "v*").split())
     changed: list[str] = []
+    base: Version | None = None
     if args.base:
         changed = _git("diff", "--name-only", f"{args.base}...HEAD").split()
+        base = project_version(_git("show", f"{args.base}:pyproject.toml"))
     release, error = decide(
-        version, latest, changes_server(changed), (ROOT / "CHANGELOG.md").read_text()
+        version,
+        latest,
+        changes_server(changed),
+        (ROOT / "CHANGELOG.md").read_text(),
+        base,
     )
     print(f"version={version}")
     print(f"release={'true' if release else 'false'}")

@@ -157,6 +157,40 @@ def test_version_check_rules(
         assert got_error and error in got_error
 
 
+@pytest.mark.parametrize(
+    ("version", "latest", "base", "server_changed", "release", "error"),
+    [
+        # Another PR bumped main to 1.1.0 and isn't tagged yet; this one too.
+        ("1.1.0", "1.0.0", "1.1.0", True, False, "already on the base branch"),
+        ("1.2.0", "1.0.0", "1.1.0", True, True, None),  # raised above main
+        ("1.0.1", "1.0.0", "1.1.0", True, False, "below 1.1.0 on the base"),
+        # Docs-only PR after main was bumped but not tagged: it carries 1.1.0.
+        ("1.1.0", "1.0.0", "1.1.0", False, True, None),
+        ("1.1.0", "1.1.0", "1.1.0", False, False, None),  # docs-only, released
+    ],
+)
+def test_version_check_against_the_base_branch(
+    version: str,
+    latest: str,
+    base: str,
+    server_changed: bool,
+    release: bool,
+    error: str | None,
+) -> None:
+    from packaging.version import Version
+
+    check = _check_version()
+    changelog = "## [1.2.0] - x\n\n## [1.1.0] - x\n\n## [1.0.1] - x\n\n## [1.0.0] - x\n"
+    got_release, got_error = check.decide(
+        Version(version), Version(latest), server_changed, changelog, Version(base)
+    )
+    assert got_release is release
+    if error is None:
+        assert got_error is None
+    else:
+        assert got_error and error in got_error
+
+
 def test_version_check_paths_and_tags() -> None:
     check = _check_version()
     assert check.changes_server(["gcore_mcp_server/server.py"])
