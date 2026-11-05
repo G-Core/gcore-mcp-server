@@ -1,0 +1,5033 @@
+{
+ "cdn.aliases.create": {
+  "access": "write",
+  "required": [
+   "cname",
+   "resource_id"
+  ]
+ },
+ "cdn.aliases.create_multiple": {
+  "access": "write",
+  "required": [
+   "items",
+   "resource_id"
+  ]
+ },
+ "cdn.aliases.delete": {
+  "access": "destructive",
+  "required": [
+   "alias_id"
+  ]
+ },
+ "cdn.aliases.delete_multiple": {
+  "access": "destructive",
+  "required": []
+ },
+ "cdn.aliases.get": {
+  "access": "read",
+  "required": [
+   "alias_id"
+  ]
+ },
+ "cdn.aliases.get_certificate_status": {
+  "access": "read",
+  "required": [
+   "alias_id"
+  ]
+ },
+ "cdn.aliases.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.aliases.retry_certificate": {
+  "access": "write",
+  "required": [
+   "alias_id"
+  ]
+ },
+ "cdn.aliases.update": {
+  "access": "write",
+  "required": [
+   "alias_id"
+  ]
+ },
+ "cdn.audit_logs.get": {
+  "access": "read",
+  "required": [
+   "log_id"
+  ]
+ },
+ "cdn.audit_logs.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.cdn_resources.create": {
+  "access": "write",
+  "required": [
+   "cname"
+  ]
+ },
+ "cdn.cdn_resources.delete": {
+  "access": "destructive",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.get": {
+  "access": "read",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.cdn_resources.prefetch": {
+  "access": "write",
+  "required": [
+   "resource_id",
+   "paths"
+  ]
+ },
+ "cdn.cdn_resources.prevalidate_ssl_le_certificate": {
+  "access": "read",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.purge": {
+  "access": "write",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.replace": {
+  "access": "destructive",
+  "required": [
+   "resource_id",
+   "origin_group"
+  ]
+ },
+ "cdn.cdn_resources.rules.create": {
+  "access": "write",
+  "required": [
+   "resource_id",
+   "name",
+   "rule",
+   "rule_type"
+  ]
+ },
+ "cdn.cdn_resources.rules.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.rules.get": {
+  "access": "read",
+  "required": [
+   "rule_id",
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.rules.list": {
+  "access": "read",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.rules.replace": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "resource_id",
+   "rule",
+   "rule_type"
+  ]
+ },
+ "cdn.cdn_resources.rules.update": {
+  "access": "write",
+  "required": [
+   "rule_id",
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.shield.get": {
+  "access": "read",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.shield.replace": {
+  "access": "destructive",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.cdn_resources.update": {
+  "access": "write",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.certificates.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cdn.certificates.delete": {
+  "access": "destructive",
+  "required": [
+   "ssl_id"
+  ]
+ },
+ "cdn.certificates.force_retry": {
+  "access": "write",
+  "required": [
+   "cert_id"
+  ]
+ },
+ "cdn.certificates.get": {
+  "access": "read",
+  "required": [
+   "ssl_id"
+  ]
+ },
+ "cdn.certificates.get_status": {
+  "access": "read",
+  "required": [
+   "cert_id"
+  ]
+ },
+ "cdn.certificates.get_usage": {
+  "access": "read",
+  "required": [
+   "cert_id"
+  ]
+ },
+ "cdn.certificates.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.certificates.renew": {
+  "access": "write",
+  "required": [
+   "cert_id"
+  ]
+ },
+ "cdn.certificates.replace": {
+  "access": "destructive",
+  "required": [
+   "ssl_id",
+   "name",
+   "ssl_certificate",
+   "ssl_private_key"
+  ]
+ },
+ "cdn.client_config.get": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.get_account_limits": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.get_account_overview": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.get_available_features": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.ip_ranges.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.ips.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.list_alibaba_regions": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.list_aws_regions": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.list_purge_statuses": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs.download": {
+  "access": "read",
+  "required": [
+   "format",
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.logs.list": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.logs_uploader.configs.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "policy",
+   "target"
+  ]
+ },
+ "cdn.logs_uploader.configs.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.configs.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.configs.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs_uploader.configs.replace": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "name",
+   "policy",
+   "target"
+  ]
+ },
+ "cdn.logs_uploader.configs.update": {
+  "access": "write",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.configs.validate": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.policies.create": {
+  "access": "write",
+  "required": []
+ },
+ "cdn.logs_uploader.policies.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.policies.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.policies.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs_uploader.policies.list_fields": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs_uploader.policies.list_fields_allowed_conversions": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs_uploader.policies.replace": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.policies.update": {
+  "access": "write",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.targets.create": {
+  "access": "write",
+  "required": [
+   "config",
+   "storage_type"
+  ]
+ },
+ "cdn.logs_uploader.targets.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.targets.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.targets.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.logs_uploader.targets.replace": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "config",
+   "storage_type"
+  ]
+ },
+ "cdn.logs_uploader.targets.update": {
+  "access": "write",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.logs_uploader.targets.validate": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.metrics.list": {
+  "access": "read",
+  "required": [
+   "from_",
+   "metrics",
+   "to"
+  ]
+ },
+ "cdn.network_capacity.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.origin_groups.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cdn.origin_groups.delete": {
+  "access": "destructive",
+  "required": [
+   "origin_group_id"
+  ]
+ },
+ "cdn.origin_groups.get": {
+  "access": "read",
+  "required": [
+   "origin_group_id"
+  ]
+ },
+ "cdn.origin_groups.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.origin_groups.replace": {
+  "access": "destructive",
+  "required": [
+   "origin_group_id",
+   "name",
+   "use_next"
+  ]
+ },
+ "cdn.origin_groups.update": {
+  "access": "write",
+  "required": [
+   "origin_group_id"
+  ]
+ },
+ "cdn.presets.applied.apply": {
+  "access": "write",
+  "required": [
+   "preset_id",
+   "object_id"
+  ]
+ },
+ "cdn.presets.applied.get": {
+  "access": "read",
+  "required": [
+   "object_id",
+   "preset_id"
+  ]
+ },
+ "cdn.presets.applied.get_objects": {
+  "access": "read",
+  "required": [
+   "preset_id"
+  ]
+ },
+ "cdn.presets.applied.get_resource_preset": {
+  "access": "read",
+  "required": [
+   "resource_id"
+  ]
+ },
+ "cdn.presets.applied.get_rule_preset": {
+  "access": "read",
+  "required": [
+   "rule_id",
+   "resource_id"
+  ]
+ },
+ "cdn.presets.applied.unapply": {
+  "access": "destructive",
+  "required": [
+   "object_id",
+   "preset_id"
+  ]
+ },
+ "cdn.presets.get": {
+  "access": "read",
+  "required": [
+   "preset_id"
+  ]
+ },
+ "cdn.presets.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.rule_templates.create": {
+  "access": "write",
+  "required": [
+   "rule",
+   "rule_type"
+  ]
+ },
+ "cdn.rule_templates.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_template_id"
+  ]
+ },
+ "cdn.rule_templates.get": {
+  "access": "read",
+  "required": [
+   "rule_template_id"
+  ]
+ },
+ "cdn.rule_templates.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.rule_templates.replace": {
+  "access": "destructive",
+  "required": [
+   "rule_template_id",
+   "rule",
+   "rule_type"
+  ]
+ },
+ "cdn.rule_templates.update": {
+  "access": "write",
+  "required": [
+   "rule_template_id"
+  ]
+ },
+ "cdn.shielding_location.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.statistics.get_alias_usage_aggregated": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_logs_usage_aggregated": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_logs_usage_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_resource_usage_aggregated": {
+  "access": "read",
+  "required": [
+   "from_",
+   "metrics",
+   "service",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_resource_usage_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "granularity",
+   "metrics",
+   "service",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_shield_usage_aggregated": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.statistics.get_shield_usage_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "cdn.trusted_ca_certificates.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "ssl_certificate"
+  ]
+ },
+ "cdn.trusted_ca_certificates.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.trusted_ca_certificates.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "cdn.trusted_ca_certificates.list": {
+  "access": "read",
+  "required": []
+ },
+ "cdn.trusted_ca_certificates.replace": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "name"
+  ]
+ },
+ "cdn.update_account": {
+  "access": "write",
+  "required": []
+ },
+ "cloud.audit_logs.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.baremetal.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.baremetal.images.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.baremetal.servers.action": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "action"
+  ]
+ },
+ "cloud.baremetal.servers.create": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "interfaces"
+  ]
+ },
+ "cloud.baremetal.servers.create_and_poll": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "interfaces"
+  ]
+ },
+ "cloud.baremetal.servers.delete": {
+  "access": "destructive",
+  "required": [
+   "server_id"
+  ]
+ },
+ "cloud.baremetal.servers.get": {
+  "access": "read",
+  "required": [
+   "server_id"
+  ]
+ },
+ "cloud.baremetal.servers.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.baremetal.servers.rebuild": {
+  "access": "destructive",
+  "required": [
+   "server_id"
+  ]
+ },
+ "cloud.baremetal.servers.rebuild_and_poll": {
+  "access": "destructive",
+  "required": [
+   "server_id"
+  ]
+ },
+ "cloud.baremetal.servers.update": {
+  "access": "write",
+  "required": [
+   "server_id"
+  ]
+ },
+ "cloud.billing_reservations.list": {
+  "access": "read",
+  "required": [
+   "time_from",
+   "time_to"
+  ]
+ },
+ "cloud.cost_reports.get_aggregated_monthly": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.cost_reports.get_breakdown": {
+  "access": "read",
+  "required": [
+   "time_from",
+   "time_to"
+  ]
+ },
+ "cloud.cost_reports.get_detailed": {
+  "access": "read",
+  "required": [
+   "time_from",
+   "time_to"
+  ]
+ },
+ "cloud.databases.postgres.clusters.create": {
+  "access": "write",
+  "required": [
+   "cluster_name",
+   "flavor",
+   "high_availability",
+   "network",
+   "pg_server_configuration",
+   "storage"
+  ]
+ },
+ "cloud.databases.postgres.clusters.delete": {
+  "access": "destructive",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.databases.postgres.clusters.get": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.databases.postgres.clusters.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.databases.postgres.clusters.update": {
+  "access": "write",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.databases.postgres.clusters.user_credentials.get": {
+  "access": "read",
+  "required": [
+   "username",
+   "cluster_name"
+  ]
+ },
+ "cloud.databases.postgres.clusters.user_credentials.regenerate": {
+  "access": "destructive",
+  "required": [
+   "username",
+   "cluster_name"
+  ]
+ },
+ "cloud.databases.postgres.configurations.get": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.databases.postgres.custom_configurations.validate": {
+  "access": "read",
+  "required": [
+   "pg_conf",
+   "version"
+  ]
+ },
+ "cloud.file_shares.access_rules.create": {
+  "access": "write",
+  "required": [
+   "file_share_id",
+   "access_mode",
+   "ip_address"
+  ]
+ },
+ "cloud.file_shares.access_rules.delete": {
+  "access": "destructive",
+  "required": [
+   "access_rule_id",
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.access_rules.list": {
+  "access": "read",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "protocol",
+   "size"
+  ]
+ },
+ "cloud.file_shares.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "protocol",
+   "size"
+  ]
+ },
+ "cloud.file_shares.delete": {
+  "access": "destructive",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.get": {
+  "access": "read",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.file_shares.resize": {
+  "access": "destructive",
+  "required": [
+   "file_share_id",
+   "size"
+  ]
+ },
+ "cloud.file_shares.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "file_share_id",
+   "size"
+  ]
+ },
+ "cloud.file_shares.update": {
+  "access": "write",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.file_shares.update_and_poll": {
+  "access": "write",
+  "required": [
+   "file_share_id"
+  ]
+ },
+ "cloud.floating_ips.assign": {
+  "access": "write",
+  "required": [
+   "floating_ip_id",
+   "port_id"
+  ]
+ },
+ "cloud.floating_ips.create": {
+  "access": "write",
+  "required": []
+ },
+ "cloud.floating_ips.create_and_poll": {
+  "access": "write",
+  "required": []
+ },
+ "cloud.floating_ips.delete": {
+  "access": "destructive",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.floating_ips.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.floating_ips.get": {
+  "access": "read",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.floating_ips.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.floating_ips.unassign": {
+  "access": "destructive",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.floating_ips.update": {
+  "access": "destructive",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.floating_ips.update_and_poll": {
+  "access": "destructive",
+  "required": [
+   "floating_ip_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.action": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "action"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.action_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "action"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.apply_settings": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.apply_settings_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.create": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "image_id",
+   "name",
+   "servers_count",
+   "servers_settings"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.create_and_poll": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "image_id",
+   "name",
+   "servers_count",
+   "servers_settings"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.delete": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_baremetal.clusters.get": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.images.delete": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.images.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.images.get": {
+  "access": "read",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.images.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_baremetal.clusters.images.upload": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.images.upload_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.interfaces.attach": {
+  "access": "write",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.interfaces.detach": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "ip_address",
+   "port_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.interfaces.list": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_baremetal.clusters.powercycle_all_servers": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.reboot_all_servers": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.rebuild": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.rebuild_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.resize": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "instances_count"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "instances_count"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.apply_settings": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.apply_settings_and_poll": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.delete": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.get_console": {
+  "access": "read",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.list": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.powercycle": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.reboot": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.rebuild": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.rebuild_and_poll": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.replace": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.servers.replace_and_poll": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.update": {
+  "access": "write",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_baremetal.clusters.update_servers_settings": {
+  "access": "write",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.action": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "action"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.action_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id",
+   "action"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.create": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "name",
+   "servers_count",
+   "servers_settings"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.create_and_poll": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "name",
+   "servers_count",
+   "servers_settings"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.delete": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_virtual.clusters.get": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.images.delete": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.images.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.images.get": {
+  "access": "read",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.images.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_virtual.clusters.images.upload": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.images.upload_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.interfaces.list": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.gpu_virtual.clusters.servers.delete": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.servers.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "server_id",
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.servers.list": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.update": {
+  "access": "write",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.gpu_virtual.clusters.volumes.list": {
+  "access": "read",
+  "required": [
+   "cluster_id"
+  ]
+ },
+ "cloud.inference.api_keys.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.inference.api_keys.delete": {
+  "access": "destructive",
+  "required": [
+   "api_key_name"
+  ]
+ },
+ "cloud.inference.api_keys.get": {
+  "access": "read",
+  "required": [
+   "api_key_name"
+  ]
+ },
+ "cloud.inference.api_keys.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.api_keys.update": {
+  "access": "write",
+  "required": [
+   "api_key_name"
+  ]
+ },
+ "cloud.inference.applications.deployments.create": {
+  "access": "write",
+  "required": [
+   "application_name",
+   "components_configuration",
+   "name",
+   "regions"
+  ]
+ },
+ "cloud.inference.applications.deployments.delete": {
+  "access": "destructive",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.applications.deployments.get": {
+  "access": "read",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.applications.deployments.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.applications.deployments.update": {
+  "access": "write",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.applications.templates.get": {
+  "access": "read",
+  "required": [
+   "application_name"
+  ]
+ },
+ "cloud.inference.applications.templates.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.deployments.create": {
+  "access": "write",
+  "required": [
+   "containers",
+   "flavor_name",
+   "image",
+   "listening_port",
+   "name"
+  ]
+ },
+ "cloud.inference.deployments.create_and_poll": {
+  "access": "write",
+  "required": [
+   "containers",
+   "flavor_name",
+   "image",
+   "listening_port",
+   "name"
+  ]
+ },
+ "cloud.inference.deployments.delete": {
+  "access": "destructive",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.get": {
+  "access": "read",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.deployments.logs.list": {
+  "access": "read",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.start": {
+  "access": "write",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.stop": {
+  "access": "destructive",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.update": {
+  "access": "write",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.deployments.update_and_poll": {
+  "access": "write",
+  "required": [
+   "deployment_name"
+  ]
+ },
+ "cloud.inference.flavors.get": {
+  "access": "read",
+  "required": [
+   "flavor_name"
+  ]
+ },
+ "cloud.inference.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.get_capacity_by_region": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.registry_credentials.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "password",
+   "registry_url",
+   "username"
+  ]
+ },
+ "cloud.inference.registry_credentials.delete": {
+  "access": "destructive",
+  "required": [
+   "credential_name"
+  ]
+ },
+ "cloud.inference.registry_credentials.get": {
+  "access": "read",
+  "required": [
+   "credential_name"
+  ]
+ },
+ "cloud.inference.registry_credentials.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.registry_credentials.replace": {
+  "access": "destructive",
+  "required": [
+   "credential_name",
+   "password",
+   "registry_url",
+   "username"
+  ]
+ },
+ "cloud.inference.secrets.create": {
+  "access": "write",
+  "required": [
+   "data",
+   "name",
+   "type"
+  ]
+ },
+ "cloud.inference.secrets.delete": {
+  "access": "destructive",
+  "required": [
+   "secret_name"
+  ]
+ },
+ "cloud.inference.secrets.get": {
+  "access": "read",
+  "required": [
+   "secret_name"
+  ]
+ },
+ "cloud.inference.secrets.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.inference.secrets.replace": {
+  "access": "destructive",
+  "required": [
+   "secret_name",
+   "data",
+   "type"
+  ]
+ },
+ "cloud.instances.action": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "action"
+  ]
+ },
+ "cloud.instances.action_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "action"
+  ]
+ },
+ "cloud.instances.add_to_placement_group": {
+  "access": "write",
+  "required": [
+   "instance_id",
+   "servergroup_id"
+  ]
+ },
+ "cloud.instances.add_to_placement_group_and_poll": {
+  "access": "write",
+  "required": [
+   "instance_id",
+   "servergroup_id"
+  ]
+ },
+ "cloud.instances.assign_security_group": {
+  "access": "write",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.create": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "interfaces",
+   "volumes"
+  ]
+ },
+ "cloud.instances.create_and_poll": {
+  "access": "write",
+  "required": [
+   "flavor",
+   "interfaces",
+   "volumes"
+  ]
+ },
+ "cloud.instances.delete": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.disable_port_security": {
+  "access": "destructive",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.instances.enable_port_security": {
+  "access": "write",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.instances.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.instances.get": {
+  "access": "read",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.get_console": {
+  "access": "read",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.images.create_from_volume": {
+  "access": "write",
+  "required": [
+   "name",
+   "volume_id"
+  ]
+ },
+ "cloud.instances.images.create_from_volume_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "volume_id"
+  ]
+ },
+ "cloud.instances.images.delete": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.instances.images.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.instances.images.get": {
+  "access": "read",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.instances.images.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.instances.images.update": {
+  "access": "write",
+  "required": [
+   "image_id"
+  ]
+ },
+ "cloud.instances.images.upload": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.instances.images.upload_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "url"
+  ]
+ },
+ "cloud.instances.interfaces.attach": {
+  "access": "write",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.interfaces.attach_and_poll": {
+  "access": "write",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.interfaces.detach": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "ip_address",
+   "port_id"
+  ]
+ },
+ "cloud.instances.interfaces.detach_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "ip_address",
+   "port_id"
+  ]
+ },
+ "cloud.instances.interfaces.list": {
+  "access": "read",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.instances.metrics.list": {
+  "access": "read",
+  "required": [
+   "instance_id",
+   "time_interval",
+   "time_unit"
+  ]
+ },
+ "cloud.instances.remove_from_placement_group": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.remove_from_placement_group_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.resize": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "flavor_id"
+  ]
+ },
+ "cloud.instances.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "flavor_id"
+  ]
+ },
+ "cloud.instances.unassign_security_group": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.update": {
+  "access": "write",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.ip_ranges.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.k8s.clusters.create": {
+  "access": "write",
+  "required": [
+   "keypair",
+   "name",
+   "pools",
+   "version"
+  ]
+ },
+ "cloud.k8s.clusters.create_and_poll": {
+  "access": "write",
+  "required": [
+   "keypair",
+   "name",
+   "pools",
+   "version"
+  ]
+ },
+ "cloud.k8s.clusters.delete": {
+  "access": "destructive",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.get": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.get_certificate": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.kubeconfig.get": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.k8s.clusters.list_versions_for_upgrade": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.nodes.delete": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.nodes.list": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.check_quota": {
+  "access": "read",
+  "required": [
+   "flavor_id"
+  ]
+ },
+ "cloud.k8s.clusters.pools.create": {
+  "access": "write",
+  "required": [
+   "cluster_name",
+   "flavor_id",
+   "min_node_count",
+   "name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.create_and_poll": {
+  "access": "write",
+  "required": [
+   "cluster_name",
+   "flavor_id",
+   "min_node_count",
+   "name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.delete": {
+  "access": "destructive",
+  "required": [
+   "pool_name",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "pool_name",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.get": {
+  "access": "read",
+  "required": [
+   "pool_name",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.list": {
+  "access": "read",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.nodes.delete": {
+  "access": "destructive",
+  "required": [
+   "instance_id",
+   "cluster_name",
+   "pool_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.nodes.list": {
+  "access": "read",
+  "required": [
+   "pool_name",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.pools.resize": {
+  "access": "destructive",
+  "required": [
+   "pool_name",
+   "cluster_name",
+   "node_count"
+  ]
+ },
+ "cloud.k8s.clusters.pools.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "pool_name",
+   "cluster_name",
+   "node_count"
+  ]
+ },
+ "cloud.k8s.clusters.pools.update": {
+  "access": "write",
+  "required": [
+   "pool_name",
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.update": {
+  "access": "write",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.update_and_poll": {
+  "access": "write",
+  "required": [
+   "cluster_name"
+  ]
+ },
+ "cloud.k8s.clusters.upgrade": {
+  "access": "destructive",
+  "required": [
+   "cluster_name",
+   "version"
+  ]
+ },
+ "cloud.k8s.clusters.upgrade_and_poll": {
+  "access": "destructive",
+  "required": [
+   "cluster_name",
+   "version"
+  ]
+ },
+ "cloud.k8s.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.k8s.list_versions": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.load_balancers.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.load_balancers.delete": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.failover": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.failover_and_poll": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.flavors.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.get": {
+  "access": "read",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.create": {
+  "access": "write",
+  "required": [
+   "action",
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.create_and_poll": {
+  "access": "write",
+  "required": [
+   "action",
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.delete": {
+  "access": "destructive",
+  "required": [
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.get": {
+  "access": "read",
+  "required": [
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.l7_policies.rules.create": {
+  "access": "write",
+  "required": [
+   "l7policy_id",
+   "compare_type",
+   "type",
+   "value"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.create_and_poll": {
+  "access": "write",
+  "required": [
+   "l7policy_id",
+   "compare_type",
+   "type",
+   "value"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.delete": {
+  "access": "destructive",
+  "required": [
+   "l7rule_id",
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "l7rule_id",
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.get": {
+  "access": "read",
+  "required": [
+   "l7rule_id",
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.list": {
+  "access": "read",
+  "required": [
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.replace": {
+  "access": "destructive",
+  "required": [
+   "l7rule_id",
+   "l7policy_id"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.rules.replace_and_poll": {
+  "access": "destructive",
+  "required": [
+   "l7rule_id",
+   "l7policy_id",
+   "compare_type",
+   "type",
+   "value"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.update": {
+  "access": "write",
+  "required": [
+   "l7policy_id",
+   "action"
+  ]
+ },
+ "cloud.load_balancers.l7_policies.update_and_poll": {
+  "access": "write",
+  "required": [
+   "l7policy_id",
+   "action"
+  ]
+ },
+ "cloud.load_balancers.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.listeners.create": {
+  "access": "write",
+  "required": [
+   "load_balancer_id",
+   "name",
+   "protocol",
+   "protocol_port"
+  ]
+ },
+ "cloud.load_balancers.listeners.create_and_poll": {
+  "access": "write",
+  "required": [
+   "load_balancer_id",
+   "name",
+   "protocol",
+   "protocol_port"
+  ]
+ },
+ "cloud.load_balancers.listeners.delete": {
+  "access": "destructive",
+  "required": [
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.listeners.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.listeners.get": {
+  "access": "read",
+  "required": [
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.listeners.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.listeners.update": {
+  "access": "write",
+  "required": [
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.listeners.update_and_poll": {
+  "access": "write",
+  "required": [
+   "listener_id"
+  ]
+ },
+ "cloud.load_balancers.metrics.list": {
+  "access": "read",
+  "required": [
+   "load_balancer_id",
+   "time_interval",
+   "time_unit"
+  ]
+ },
+ "cloud.load_balancers.pools.create": {
+  "access": "write",
+  "required": [
+   "lb_algorithm",
+   "name",
+   "protocol"
+  ]
+ },
+ "cloud.load_balancers.pools.create_and_poll": {
+  "access": "write",
+  "required": [
+   "lb_algorithm",
+   "name",
+   "protocol"
+  ]
+ },
+ "cloud.load_balancers.pools.delete": {
+  "access": "destructive",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.get": {
+  "access": "read",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.health_monitors.create": {
+  "access": "write",
+  "required": [
+   "pool_id",
+   "delay",
+   "max_retries",
+   "api_timeout",
+   "type"
+  ]
+ },
+ "cloud.load_balancers.pools.health_monitors.delete": {
+  "access": "destructive",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.health_monitors.get": {
+  "access": "read",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.health_monitors.update": {
+  "access": "write",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.pools.members.create": {
+  "access": "write",
+  "required": [
+   "pool_id",
+   "address",
+   "protocol_port"
+  ]
+ },
+ "cloud.load_balancers.pools.members.create_and_poll": {
+  "access": "write",
+  "required": [
+   "pool_id",
+   "address",
+   "protocol_port"
+  ]
+ },
+ "cloud.load_balancers.pools.members.delete": {
+  "access": "destructive",
+  "required": [
+   "member_id",
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "member_id",
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.get": {
+  "access": "read",
+  "required": [
+   "member_id",
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.list": {
+  "access": "read",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.replace": {
+  "access": "destructive",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.replace_and_poll": {
+  "access": "destructive",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.update": {
+  "access": "write",
+  "required": [
+   "member_id",
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.members.update_and_poll": {
+  "access": "write",
+  "required": [
+   "member_id",
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.update": {
+  "access": "write",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.pools.update_and_poll": {
+  "access": "write",
+  "required": [
+   "pool_id"
+  ]
+ },
+ "cloud.load_balancers.resize": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id",
+   "flavor"
+  ]
+ },
+ "cloud.load_balancers.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "load_balancer_id",
+   "flavor"
+  ]
+ },
+ "cloud.load_balancers.statuses.get": {
+  "access": "read",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.load_balancers.statuses.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.load_balancers.update": {
+  "access": "write",
+  "required": [
+   "load_balancer_id"
+  ]
+ },
+ "cloud.networks.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.networks.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.networks.delete": {
+  "access": "destructive",
+  "required": [
+   "network_id"
+  ]
+ },
+ "cloud.networks.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "network_id"
+  ]
+ },
+ "cloud.networks.get": {
+  "access": "read",
+  "required": [
+   "network_id"
+  ]
+ },
+ "cloud.networks.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.networks.routers.attach_subnet": {
+  "access": "write",
+  "required": [
+   "router_id",
+   "subnet_id"
+  ]
+ },
+ "cloud.networks.routers.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.networks.routers.delete": {
+  "access": "destructive",
+  "required": [
+   "router_id"
+  ]
+ },
+ "cloud.networks.routers.detach_subnet": {
+  "access": "destructive",
+  "required": [
+   "router_id",
+   "subnet_id"
+  ]
+ },
+ "cloud.networks.routers.get": {
+  "access": "read",
+  "required": [
+   "router_id"
+  ]
+ },
+ "cloud.networks.routers.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.networks.routers.metrics.list": {
+  "access": "read",
+  "required": [
+   "router_id",
+   "time_interval",
+   "time_unit"
+  ]
+ },
+ "cloud.networks.routers.update": {
+  "access": "write",
+  "required": [
+   "router_id"
+  ]
+ },
+ "cloud.networks.routers.update_and_poll": {
+  "access": "write",
+  "required": [
+   "router_id"
+  ]
+ },
+ "cloud.networks.subnets.create": {
+  "access": "write",
+  "required": [
+   "cidr",
+   "name",
+   "network_id"
+  ]
+ },
+ "cloud.networks.subnets.create_and_poll": {
+  "access": "write",
+  "required": [
+   "cidr",
+   "name",
+   "network_id"
+  ]
+ },
+ "cloud.networks.subnets.delete": {
+  "access": "destructive",
+  "required": [
+   "subnet_id"
+  ]
+ },
+ "cloud.networks.subnets.get": {
+  "access": "read",
+  "required": [
+   "subnet_id"
+  ]
+ },
+ "cloud.networks.subnets.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.networks.subnets.update": {
+  "access": "write",
+  "required": [
+   "subnet_id"
+  ]
+ },
+ "cloud.networks.update": {
+  "access": "write",
+  "required": [
+   "network_id"
+  ]
+ },
+ "cloud.networks.update_and_poll": {
+  "access": "write",
+  "required": [
+   "network_id"
+  ]
+ },
+ "cloud.placement_groups.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "policy"
+  ]
+ },
+ "cloud.placement_groups.delete": {
+  "access": "destructive",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.placement_groups.get": {
+  "access": "read",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.placement_groups.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.projects.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.projects.delete": {
+  "access": "destructive",
+  "required": []
+ },
+ "cloud.projects.get": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.projects.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.projects.update": {
+  "access": "write",
+  "required": []
+ },
+ "cloud.quotas.get_all": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.quotas.get_by_region": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.quotas.get_global": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.quotas.notification_threshold.delete": {
+  "access": "destructive",
+  "required": []
+ },
+ "cloud.quotas.notification_threshold.get": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.quotas.notification_threshold.update": {
+  "access": "write",
+  "required": [
+   "threshold"
+  ]
+ },
+ "cloud.quotas.requests.create": {
+  "access": "write",
+  "required": [
+   "description",
+   "requested_limits"
+  ]
+ },
+ "cloud.quotas.requests.delete": {
+  "access": "destructive",
+  "required": [
+   "request_id"
+  ]
+ },
+ "cloud.quotas.requests.get": {
+  "access": "read",
+  "required": [
+   "request_id"
+  ]
+ },
+ "cloud.quotas.requests.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.regions.get": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.regions.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.registries.artifacts.delete": {
+  "access": "destructive",
+  "required": [
+   "digest",
+   "registry_id",
+   "repository_name"
+  ]
+ },
+ "cloud.registries.artifacts.list": {
+  "access": "read",
+  "required": [
+   "repository_name",
+   "registry_id"
+  ]
+ },
+ "cloud.registries.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.registries.delete": {
+  "access": "destructive",
+  "required": [
+   "registry_id"
+  ]
+ },
+ "cloud.registries.get": {
+  "access": "read",
+  "required": [
+   "registry_id"
+  ]
+ },
+ "cloud.registries.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.registries.repositories.delete": {
+  "access": "destructive",
+  "required": [
+   "repository_name",
+   "registry_id"
+  ]
+ },
+ "cloud.registries.repositories.list": {
+  "access": "read",
+  "required": [
+   "registry_id"
+  ]
+ },
+ "cloud.registries.resize": {
+  "access": "destructive",
+  "required": [
+   "registry_id"
+  ]
+ },
+ "cloud.registries.tags.delete": {
+  "access": "destructive",
+  "required": [
+   "tag_name",
+   "registry_id",
+   "repository_name",
+   "digest"
+  ]
+ },
+ "cloud.registries.users.create": {
+  "access": "write",
+  "required": [
+   "registry_id",
+   "duration",
+   "name"
+  ]
+ },
+ "cloud.registries.users.create_multiple": {
+  "access": "write",
+  "required": [
+   "registry_id",
+   "users"
+  ]
+ },
+ "cloud.registries.users.delete": {
+  "access": "destructive",
+  "required": [
+   "user_id",
+   "registry_id"
+  ]
+ },
+ "cloud.registries.users.list": {
+  "access": "read",
+  "required": [
+   "registry_id"
+  ]
+ },
+ "cloud.registries.users.refresh_secret": {
+  "access": "destructive",
+  "required": [
+   "user_id",
+   "registry_id"
+  ]
+ },
+ "cloud.registries.users.update": {
+  "access": "write",
+  "required": [
+   "user_id",
+   "registry_id",
+   "duration"
+  ]
+ },
+ "cloud.reserved_fixed_ips.create": {
+  "access": "write",
+  "required": [
+   "type"
+  ]
+ },
+ "cloud.reserved_fixed_ips.create_and_poll": {
+  "access": "write",
+  "required": [
+   "type"
+  ]
+ },
+ "cloud.reserved_fixed_ips.delete": {
+  "access": "destructive",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.get": {
+  "access": "read",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.reserved_fixed_ips.update": {
+  "access": "destructive",
+  "required": [
+   "port_id",
+   "is_vip"
+  ]
+ },
+ "cloud.reserved_fixed_ips.vip.candidate_ports.list": {
+  "access": "read",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.vip.connected_ports.add": {
+  "access": "write",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.vip.connected_ports.list": {
+  "access": "read",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.vip.connected_ports.replace": {
+  "access": "destructive",
+  "required": [
+   "port_id"
+  ]
+ },
+ "cloud.reserved_fixed_ips.vip.toggle": {
+  "access": "destructive",
+  "required": [
+   "port_id",
+   "is_vip"
+  ]
+ },
+ "cloud.secrets.delete": {
+  "access": "destructive",
+  "required": [
+   "secret_id"
+  ]
+ },
+ "cloud.secrets.get": {
+  "access": "read",
+  "required": [
+   "secret_id"
+  ]
+ },
+ "cloud.secrets.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.secrets.upload_tls_certificate": {
+  "access": "write",
+  "required": [
+   "name",
+   "payload"
+  ]
+ },
+ "cloud.secrets.upload_tls_certificate_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "payload"
+  ]
+ },
+ "cloud.security_groups.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.security_groups.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.security_groups.delete": {
+  "access": "destructive",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.get": {
+  "access": "read",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.security_groups.revert_to_default": {
+  "access": "destructive",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.rules.create": {
+  "access": "write",
+  "required": [
+   "group_id",
+   "direction"
+  ]
+ },
+ "cloud.security_groups.rules.create_and_poll": {
+  "access": "write",
+  "required": [
+   "group_id",
+   "direction"
+  ]
+ },
+ "cloud.security_groups.rules.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.rules.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.rules.replace": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "direction"
+  ]
+ },
+ "cloud.security_groups.update": {
+  "access": "write",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.security_groups.update_and_poll": {
+  "access": "write",
+  "required": [
+   "group_id"
+  ]
+ },
+ "cloud.snapshot_schedules.add_schedules": {
+  "access": "write",
+  "required": [
+   "policy_id",
+   "schedules"
+  ]
+ },
+ "cloud.snapshot_schedules.add_volumes": {
+  "access": "write",
+  "required": [
+   "policy_id",
+   "volume_ids"
+  ]
+ },
+ "cloud.snapshot_schedules.create": {
+  "access": "write",
+  "required": [
+   "action",
+   "name"
+  ]
+ },
+ "cloud.snapshot_schedules.delete": {
+  "access": "destructive",
+  "required": [
+   "policy_id"
+  ]
+ },
+ "cloud.snapshot_schedules.estimate_max_usage": {
+  "access": "read",
+  "required": [
+   "action",
+   "name"
+  ]
+ },
+ "cloud.snapshot_schedules.get": {
+  "access": "read",
+  "required": [
+   "policy_id"
+  ]
+ },
+ "cloud.snapshot_schedules.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.snapshot_schedules.remove_schedules": {
+  "access": "destructive",
+  "required": [
+   "policy_id",
+   "schedule_ids"
+  ]
+ },
+ "cloud.snapshot_schedules.remove_volumes": {
+  "access": "destructive",
+  "required": [
+   "policy_id",
+   "volume_ids"
+  ]
+ },
+ "cloud.snapshot_schedules.update": {
+  "access": "write",
+  "required": [
+   "policy_id"
+  ]
+ },
+ "cloud.ssh_keys.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "cloud.ssh_keys.delete": {
+  "access": "destructive",
+  "required": [
+   "ssh_key_id"
+  ]
+ },
+ "cloud.ssh_keys.get": {
+  "access": "read",
+  "required": [
+   "ssh_key_id"
+  ]
+ },
+ "cloud.ssh_keys.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.ssh_keys.update": {
+  "access": "write",
+  "required": [
+   "ssh_key_id",
+   "shared_in_project"
+  ]
+ },
+ "cloud.tasks.acknowledge_all": {
+  "access": "write",
+  "required": []
+ },
+ "cloud.tasks.acknowledge_one": {
+  "access": "write",
+  "required": [
+   "task_id"
+  ]
+ },
+ "cloud.tasks.get": {
+  "access": "read",
+  "required": [
+   "task_id"
+  ]
+ },
+ "cloud.tasks.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.tasks.poll": {
+  "access": "read",
+  "required": [
+   "task_id"
+  ]
+ },
+ "cloud.usage_reports.get": {
+  "access": "read",
+  "required": [
+   "time_from",
+   "time_to"
+  ]
+ },
+ "cloud.users.role_assignments.create": {
+  "access": "write",
+  "required": [
+   "role",
+   "user_id"
+  ]
+ },
+ "cloud.users.role_assignments.delete": {
+  "access": "destructive",
+  "required": [
+   "assignment_id"
+  ]
+ },
+ "cloud.users.role_assignments.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.users.role_assignments.update": {
+  "access": "write",
+  "required": [
+   "assignment_id",
+   "role",
+   "user_id"
+  ]
+ },
+ "cloud.volume_snapshots.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "volume_id"
+  ]
+ },
+ "cloud.volume_snapshots.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "volume_id"
+  ]
+ },
+ "cloud.volume_snapshots.delete": {
+  "access": "destructive",
+  "required": [
+   "snapshot_id"
+  ]
+ },
+ "cloud.volume_snapshots.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "snapshot_id"
+  ]
+ },
+ "cloud.volume_snapshots.get": {
+  "access": "read",
+  "required": [
+   "snapshot_id"
+  ]
+ },
+ "cloud.volume_snapshots.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.volume_snapshots.update": {
+  "access": "write",
+  "required": [
+   "snapshot_id"
+  ]
+ },
+ "cloud.volumes.attach_to_instance": {
+  "access": "write",
+  "required": [
+   "volume_id",
+   "instance_id"
+  ]
+ },
+ "cloud.volumes.attach_to_instance_and_poll": {
+  "access": "write",
+  "required": [
+   "volume_id",
+   "instance_id"
+  ]
+ },
+ "cloud.volumes.change_type": {
+  "access": "write",
+  "required": [
+   "volume_id",
+   "volume_type"
+  ]
+ },
+ "cloud.volumes.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "source"
+  ]
+ },
+ "cloud.volumes.create_and_poll": {
+  "access": "write",
+  "required": [
+   "name",
+   "source"
+  ]
+ },
+ "cloud.volumes.delete": {
+  "access": "destructive",
+  "required": [
+   "volume_id"
+  ]
+ },
+ "cloud.volumes.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "volume_id"
+  ]
+ },
+ "cloud.volumes.detach_from_instance": {
+  "access": "destructive",
+  "required": [
+   "volume_id",
+   "instance_id"
+  ]
+ },
+ "cloud.volumes.detach_from_instance_and_poll": {
+  "access": "destructive",
+  "required": [
+   "volume_id",
+   "instance_id"
+  ]
+ },
+ "cloud.volumes.get": {
+  "access": "read",
+  "required": [
+   "volume_id"
+  ]
+ },
+ "cloud.volumes.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.volumes.resize": {
+  "access": "destructive",
+  "required": [
+   "volume_id",
+   "size"
+  ]
+ },
+ "cloud.volumes.resize_and_poll": {
+  "access": "destructive",
+  "required": [
+   "volume_id",
+   "size"
+  ]
+ },
+ "cloud.volumes.revert_to_last_snapshot": {
+  "access": "destructive",
+  "required": [
+   "volume_id"
+  ]
+ },
+ "cloud.volumes.types.list": {
+  "access": "read",
+  "required": []
+ },
+ "cloud.volumes.update": {
+  "access": "write",
+  "required": [
+   "volume_id"
+  ]
+ },
+ "dns.get_account_overview": {
+  "access": "read",
+  "required": []
+ },
+ "dns.locations.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.locations.list_continents": {
+  "access": "read",
+  "required": []
+ },
+ "dns.locations.list_countries": {
+  "access": "read",
+  "required": []
+ },
+ "dns.locations.list_regions": {
+  "access": "read",
+  "required": []
+ },
+ "dns.lookup": {
+  "access": "read",
+  "required": []
+ },
+ "dns.metrics.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.network_mappings.create": {
+  "access": "write",
+  "required": []
+ },
+ "dns.network_mappings.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "dns.network_mappings.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "dns.network_mappings.get_by_name": {
+  "access": "read",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.network_mappings.import_": {
+  "access": "write",
+  "required": []
+ },
+ "dns.network_mappings.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.network_mappings.replace": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "dns.pickers.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.pickers.presets.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.zones.check_delegation_status": {
+  "access": "read",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.delete": {
+  "access": "destructive",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.disable": {
+  "access": "destructive",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.dnssec.get": {
+  "access": "read",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.dnssec.update": {
+  "access": "destructive",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.enable": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.export": {
+  "access": "read",
+  "required": [
+   "zone_name"
+  ]
+ },
+ "dns.zones.get": {
+  "access": "read",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.get_statistics": {
+  "access": "read",
+  "required": [
+   "name"
+  ]
+ },
+ "dns.zones.import_": {
+  "access": "write",
+  "required": [
+   "zone_name"
+  ]
+ },
+ "dns.zones.list": {
+  "access": "read",
+  "required": []
+ },
+ "dns.zones.replace": {
+  "access": "destructive",
+  "required": [
+   "path_name",
+   "body_name"
+  ]
+ },
+ "dns.zones.rrsets.create": {
+  "access": "write",
+  "required": [
+   "rrset_type",
+   "zone_name",
+   "rrset_name",
+   "resource_records"
+  ]
+ },
+ "dns.zones.rrsets.delete": {
+  "access": "destructive",
+  "required": [
+   "rrset_type",
+   "zone_name",
+   "rrset_name"
+  ]
+ },
+ "dns.zones.rrsets.get": {
+  "access": "read",
+  "required": [
+   "rrset_type",
+   "zone_name",
+   "rrset_name"
+  ]
+ },
+ "dns.zones.rrsets.get_failover_logs": {
+  "access": "read",
+  "required": [
+   "rrset_type",
+   "zone_name",
+   "rrset_name"
+  ]
+ },
+ "dns.zones.rrsets.list": {
+  "access": "read",
+  "required": [
+   "zone_name"
+  ]
+ },
+ "dns.zones.rrsets.replace": {
+  "access": "destructive",
+  "required": [
+   "rrset_type",
+   "zone_name",
+   "rrset_name",
+   "resource_records"
+  ]
+ },
+ "fastedge.apps.create": {
+  "access": "write",
+  "required": []
+ },
+ "fastedge.apps.delete": {
+  "access": "destructive",
+  "required": [
+   "app_id"
+  ]
+ },
+ "fastedge.apps.get": {
+  "access": "read",
+  "required": [
+   "app_id"
+  ]
+ },
+ "fastedge.apps.list": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.apps.logs.list": {
+  "access": "read",
+  "required": [
+   "app_id"
+  ]
+ },
+ "fastedge.apps.replace": {
+  "access": "destructive",
+  "required": [
+   "app_id"
+  ]
+ },
+ "fastedge.apps.update": {
+  "access": "write",
+  "required": [
+   "app_id"
+  ]
+ },
+ "fastedge.binaries.create": {
+  "access": "write",
+  "required": [
+   "body"
+  ]
+ },
+ "fastedge.binaries.delete": {
+  "access": "destructive",
+  "required": [
+   "binary_id"
+  ]
+ },
+ "fastedge.binaries.get": {
+  "access": "read",
+  "required": [
+   "binary_id"
+  ]
+ },
+ "fastedge.binaries.list": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.get_account_overview": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.kv_stores.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "fastedge.kv_stores.delete": {
+  "access": "destructive",
+  "required": [
+   "store_id"
+  ]
+ },
+ "fastedge.kv_stores.get": {
+  "access": "read",
+  "required": [
+   "store_id"
+  ]
+ },
+ "fastedge.kv_stores.list": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.kv_stores.replace": {
+  "access": "destructive",
+  "required": [
+   "store_id",
+   "name"
+  ]
+ },
+ "fastedge.secrets.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "fastedge.secrets.delete": {
+  "access": "destructive",
+  "required": [
+   "secret_id"
+  ]
+ },
+ "fastedge.secrets.get": {
+  "access": "read",
+  "required": [
+   "secret_id"
+  ]
+ },
+ "fastedge.secrets.list": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.secrets.replace": {
+  "access": "destructive",
+  "required": [
+   "secret_id",
+   "name"
+  ]
+ },
+ "fastedge.secrets.update": {
+  "access": "write",
+  "required": [
+   "secret_id"
+  ]
+ },
+ "fastedge.statistics.get_call_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "step",
+   "to"
+  ]
+ },
+ "fastedge.statistics.get_duration_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "step",
+   "to"
+  ]
+ },
+ "fastedge.templates.create": {
+  "access": "write",
+  "required": [
+   "binary_id",
+   "name",
+   "owned",
+   "params"
+  ]
+ },
+ "fastedge.templates.delete": {
+  "access": "destructive",
+  "required": [
+   "template_id"
+  ]
+ },
+ "fastedge.templates.get": {
+  "access": "read",
+  "required": [
+   "template_id"
+  ]
+ },
+ "fastedge.templates.list": {
+  "access": "read",
+  "required": []
+ },
+ "fastedge.templates.replace": {
+  "access": "destructive",
+  "required": [
+   "template_id",
+   "binary_id",
+   "name",
+   "owned",
+   "params"
+  ]
+ },
+ "iam.api_tokens.create": {
+  "access": "write",
+  "required": [
+   "client_user",
+   "exp_date",
+   "name"
+  ]
+ },
+ "iam.api_tokens.delete": {
+  "access": "destructive",
+  "required": [
+   "token_id"
+  ]
+ },
+ "iam.api_tokens.get": {
+  "access": "read",
+  "required": [
+   "token_id"
+  ]
+ },
+ "iam.api_tokens.list": {
+  "access": "read",
+  "required": []
+ },
+ "iam.get_account_overview": {
+  "access": "read",
+  "required": []
+ },
+ "iam.users.delete": {
+  "access": "destructive",
+  "required": [
+   "user_id"
+  ]
+ },
+ "iam.users.get": {
+  "access": "read",
+  "required": [
+   "user_id"
+  ]
+ },
+ "iam.users.invite": {
+  "access": "write",
+  "required": [
+   "email",
+   "user_role"
+  ]
+ },
+ "iam.users.list": {
+  "access": "read",
+  "required": []
+ },
+ "iam.users.update": {
+  "access": "write",
+  "required": [
+   "user_id"
+  ]
+ },
+ "security.bgp_announces.list": {
+  "access": "read",
+  "required": []
+ },
+ "security.bgp_announces.toggle": {
+  "access": "destructive",
+  "required": [
+   "announce",
+   "enabled"
+  ]
+ },
+ "security.events.get": {
+  "access": "read",
+  "required": [
+   "event_log_id"
+  ]
+ },
+ "security.events.list": {
+  "access": "read",
+  "required": []
+ },
+ "security.profile_templates.list": {
+  "access": "read",
+  "required": []
+ },
+ "security.profiles.create": {
+  "access": "write",
+  "required": [
+   "fields",
+   "profile_template",
+   "site"
+  ]
+ },
+ "security.profiles.delete": {
+  "access": "destructive",
+  "required": [
+   "id"
+  ]
+ },
+ "security.profiles.get": {
+  "access": "read",
+  "required": [
+   "id"
+  ]
+ },
+ "security.profiles.list": {
+  "access": "read",
+  "required": []
+ },
+ "security.profiles.recreate": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "fields",
+   "profile_template"
+  ]
+ },
+ "security.profiles.replace": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "fields",
+   "profile_template"
+  ]
+ },
+ "storage.locations.list": {
+  "access": "read",
+  "required": []
+ },
+ "storage.object_storages.access_keys.create": {
+  "access": "write",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.access_keys.delete": {
+  "access": "destructive",
+  "required": [
+   "access_key",
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.access_keys.get": {
+  "access": "read",
+  "required": [
+   "access_key",
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.access_keys.list": {
+  "access": "read",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.buckets.create": {
+  "access": "write",
+  "required": [
+   "storage_id",
+   "name"
+  ]
+ },
+ "storage.object_storages.buckets.delete": {
+  "access": "destructive",
+  "required": [
+   "name",
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.buckets.get": {
+  "access": "read",
+  "required": [
+   "name",
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.buckets.list": {
+  "access": "read",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.buckets.update": {
+  "access": "write",
+  "required": [
+   "name",
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.create": {
+  "access": "write",
+  "required": [
+   "location_name",
+   "name"
+  ]
+ },
+ "storage.object_storages.delete": {
+  "access": "destructive",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.get": {
+  "access": "read",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.object_storages.list": {
+  "access": "read",
+  "required": []
+ },
+ "storage.object_storages.restore": {
+  "access": "write",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.sftp_storages.create": {
+  "access": "write",
+  "required": [
+   "location_name",
+   "name",
+   "password_mode"
+  ]
+ },
+ "storage.sftp_storages.delete": {
+  "access": "destructive",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.sftp_storages.get": {
+  "access": "read",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.sftp_storages.list": {
+  "access": "read",
+  "required": []
+ },
+ "storage.sftp_storages.update": {
+  "access": "write",
+  "required": [
+   "storage_id"
+  ]
+ },
+ "storage.ssh_keys.create": {
+  "access": "write",
+  "required": [
+   "name",
+   "public_key"
+  ]
+ },
+ "storage.ssh_keys.delete": {
+  "access": "destructive",
+  "required": [
+   "ssh_key_id"
+  ]
+ },
+ "storage.ssh_keys.get": {
+  "access": "read",
+  "required": [
+   "ssh_key_id"
+  ]
+ },
+ "storage.ssh_keys.list": {
+  "access": "read",
+  "required": []
+ },
+ "storage.statistics.get_usage_aggregated": {
+  "access": "read",
+  "required": []
+ },
+ "storage.statistics.get_usage_series": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.ai_tasks.cancel": {
+  "access": "destructive",
+  "required": [
+   "task_id"
+  ]
+ },
+ "streaming.ai_tasks.create": {
+  "access": "write",
+  "required": [
+   "task_name",
+   "url"
+  ]
+ },
+ "streaming.ai_tasks.get": {
+  "access": "read",
+  "required": [
+   "task_id"
+  ]
+ },
+ "streaming.ai_tasks.get_ai_settings": {
+  "access": "read",
+  "required": [
+   "type"
+  ]
+ },
+ "streaming.ai_tasks.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.broadcasts.create": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.broadcasts.delete": {
+  "access": "destructive",
+  "required": [
+   "broadcast_id"
+  ]
+ },
+ "streaming.broadcasts.get": {
+  "access": "read",
+  "required": [
+   "broadcast_id"
+  ]
+ },
+ "streaming.broadcasts.get_spectators_count": {
+  "access": "read",
+  "required": [
+   "broadcast_id"
+  ]
+ },
+ "streaming.broadcasts.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.broadcasts.update": {
+  "access": "write",
+  "required": [
+   "broadcast_id"
+  ]
+ },
+ "streaming.directories.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "streaming.directories.delete": {
+  "access": "destructive",
+  "required": [
+   "directory_id"
+  ]
+ },
+ "streaming.directories.get": {
+  "access": "read",
+  "required": [
+   "directory_id"
+  ]
+ },
+ "streaming.directories.get_tree": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.directories.update": {
+  "access": "write",
+  "required": [
+   "directory_id"
+  ]
+ },
+ "streaming.players.create": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.players.delete": {
+  "access": "destructive",
+  "required": [
+   "player_id"
+  ]
+ },
+ "streaming.players.get": {
+  "access": "read",
+  "required": [
+   "player_id"
+  ]
+ },
+ "streaming.players.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.players.preview": {
+  "access": "read",
+  "required": [
+   "player_id"
+  ]
+ },
+ "streaming.players.update": {
+  "access": "write",
+  "required": [
+   "player_id"
+  ]
+ },
+ "streaming.playlists.create": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.playlists.delete": {
+  "access": "destructive",
+  "required": [
+   "playlist_id"
+  ]
+ },
+ "streaming.playlists.get": {
+  "access": "read",
+  "required": [
+   "playlist_id"
+  ]
+ },
+ "streaming.playlists.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.playlists.update": {
+  "access": "write",
+  "required": [
+   "playlist_id"
+  ]
+ },
+ "streaming.playlists.videos.list": {
+  "access": "read",
+  "required": [
+   "playlist_id"
+  ]
+ },
+ "streaming.quality_sets.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.quality_sets.set_default": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.restreams.create": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.restreams.delete": {
+  "access": "destructive",
+  "required": [
+   "restream_id"
+  ]
+ },
+ "streaming.restreams.get": {
+  "access": "read",
+  "required": [
+   "restream_id"
+  ]
+ },
+ "streaming.restreams.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.restreams.update": {
+  "access": "write",
+  "required": [
+   "restream_id"
+  ]
+ },
+ "streaming.statistics.get_ffprobes": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to",
+   "stream_id"
+  ]
+ },
+ "streaming.statistics.get_live_unique_viewers": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_live_watch_time_cdn": {
+  "access": "read",
+  "required": [
+   "from_"
+  ]
+ },
+ "streaming.statistics.get_live_watch_time_total_cdn": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.statistics.get_max_streams_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_popular_videos": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_storage_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_stream_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_unique_viewers": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_unique_viewers_cdn": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_browsers": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_country": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_hostname": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_operating_system": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_referer": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_by_region": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to"
+  ]
+ },
+ "streaming.statistics.get_views_heatmap": {
+  "access": "read",
+  "required": [
+   "date_from",
+   "date_to",
+   "stream_id",
+   "type"
+  ]
+ },
+ "streaming.statistics.get_vod_storage_volume": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_vod_transcoding_duration": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_vod_unique_viewers_cdn": {
+  "access": "read",
+  "required": [
+   "from_",
+   "to"
+  ]
+ },
+ "streaming.statistics.get_vod_watch_time_cdn": {
+  "access": "read",
+  "required": [
+   "from_"
+  ]
+ },
+ "streaming.statistics.get_vod_watch_time_total_cdn": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.streams.clear_dvr": {
+  "access": "destructive",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.clips.create": {
+  "access": "write",
+  "required": [
+   "stream_id",
+   "duration"
+  ]
+ },
+ "streaming.streams.clips.list": {
+  "access": "read",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "streaming.streams.delete": {
+  "access": "destructive",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.get": {
+  "access": "read",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.streams.overlays.create": {
+  "access": "write",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.overlays.delete": {
+  "access": "destructive",
+  "required": [
+   "overlay_id",
+   "stream_id"
+  ]
+ },
+ "streaming.streams.overlays.get": {
+  "access": "read",
+  "required": [
+   "overlay_id",
+   "stream_id"
+  ]
+ },
+ "streaming.streams.overlays.list": {
+  "access": "read",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.overlays.update": {
+  "access": "write",
+  "required": [
+   "overlay_id",
+   "stream_id"
+  ]
+ },
+ "streaming.streams.overlays.update_multiple": {
+  "access": "write",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.start_recording": {
+  "access": "write",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.stop_recording": {
+  "access": "destructive",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.streams.update": {
+  "access": "write",
+  "required": [
+   "stream_id"
+  ]
+ },
+ "streaming.videos.create": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.videos.create_multiple": {
+  "access": "write",
+  "required": []
+ },
+ "streaming.videos.delete": {
+  "access": "destructive",
+  "required": [
+   "video_id"
+  ]
+ },
+ "streaming.videos.get": {
+  "access": "read",
+  "required": [
+   "video_id"
+  ]
+ },
+ "streaming.videos.get_parameters_for_direct_upload": {
+  "access": "read",
+  "required": [
+   "video_id"
+  ]
+ },
+ "streaming.videos.list": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.videos.list_names": {
+  "access": "read",
+  "required": []
+ },
+ "streaming.videos.subtitles.create": {
+  "access": "write",
+  "required": [
+   "video_id",
+   "body"
+  ]
+ },
+ "streaming.videos.subtitles.delete": {
+  "access": "destructive",
+  "required": [
+   "id",
+   "video_id"
+  ]
+ },
+ "streaming.videos.subtitles.get": {
+  "access": "read",
+  "required": [
+   "id",
+   "video_id"
+  ]
+ },
+ "streaming.videos.subtitles.list": {
+  "access": "read",
+  "required": [
+   "video_id"
+  ]
+ },
+ "streaming.videos.subtitles.update": {
+  "access": "write",
+  "required": [
+   "id",
+   "video_id"
+  ]
+ },
+ "streaming.videos.update": {
+  "access": "write",
+  "required": [
+   "video_id",
+   "name"
+  ]
+ },
+ "waap.advanced_rules.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.analytics.get_event_statistics": {
+  "access": "read",
+  "required": [
+   "dimension",
+   "start"
+  ]
+ },
+ "waap.analytics.get_events": {
+  "access": "read",
+  "required": [
+   "start"
+  ]
+ },
+ "waap.analytics.get_filters": {
+  "access": "read",
+  "required": [
+   "type",
+   "start"
+  ]
+ },
+ "waap.analytics.get_requests": {
+  "access": "read",
+  "required": [
+   "start"
+  ]
+ },
+ "waap.analytics.get_traffic": {
+  "access": "read",
+  "required": [
+   "resolution",
+   "start"
+  ]
+ },
+ "waap.analytics.get_traffic_filtered": {
+  "access": "read",
+  "required": [
+   "resolution",
+   "start"
+  ]
+ },
+ "waap.custom_page_sets.create": {
+  "access": "write",
+  "required": [
+   "name"
+  ]
+ },
+ "waap.custom_page_sets.delete": {
+  "access": "destructive",
+  "required": [
+   "set_id"
+  ]
+ },
+ "waap.custom_page_sets.get": {
+  "access": "read",
+  "required": [
+   "set_id"
+  ]
+ },
+ "waap.custom_page_sets.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.custom_page_sets.preview": {
+  "access": "read",
+  "required": [
+   "page_type"
+  ]
+ },
+ "waap.custom_page_sets.update": {
+  "access": "write",
+  "required": [
+   "set_id"
+  ]
+ },
+ "waap.domains.advanced_rules.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "action",
+   "enabled",
+   "name",
+   "source"
+  ]
+ },
+ "waap.domains.advanced_rules.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.advanced_rules.get": {
+  "access": "read",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.advanced_rules.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.advanced_rules.toggle": {
+  "access": "destructive",
+  "required": [
+   "action",
+   "domain_id",
+   "rule_id"
+  ]
+ },
+ "waap.domains.advanced_rules.update": {
+  "access": "write",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_discovery.openapi.scan": {
+  "access": "write",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_discovery.openapi.upload": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "file_data",
+   "file_name"
+  ]
+ },
+ "waap.domains.api_discovery.scan_results.get": {
+  "access": "read",
+  "required": [
+   "scan_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_discovery.scan_results.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_discovery.settings.get": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_discovery.settings.update": {
+  "access": "write",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_path_groups.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_paths.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "http_scheme",
+   "method",
+   "path"
+  ]
+ },
+ "waap.domains.api_paths.delete": {
+  "access": "destructive",
+  "required": [
+   "path_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_paths.get": {
+  "access": "read",
+  "required": [
+   "path_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_paths.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.api_paths.update": {
+  "access": "write",
+  "required": [
+   "path_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.custom_rules.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "action",
+   "conditions",
+   "enabled",
+   "name"
+  ]
+ },
+ "waap.domains.custom_rules.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.custom_rules.delete_multiple": {
+  "access": "destructive",
+  "required": [
+   "domain_id",
+   "rule_ids"
+  ]
+ },
+ "waap.domains.custom_rules.get": {
+  "access": "read",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.custom_rules.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.custom_rules.toggle": {
+  "access": "destructive",
+  "required": [
+   "action",
+   "domain_id",
+   "rule_id"
+  ]
+ },
+ "waap.domains.custom_rules.update": {
+  "access": "write",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.delete": {
+  "access": "destructive",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.firewall_rules.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "action",
+   "conditions",
+   "enabled",
+   "name"
+  ]
+ },
+ "waap.domains.firewall_rules.delete": {
+  "access": "destructive",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.firewall_rules.delete_multiple": {
+  "access": "destructive",
+  "required": [
+   "domain_id",
+   "rule_ids"
+  ]
+ },
+ "waap.domains.firewall_rules.get": {
+  "access": "read",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.firewall_rules.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.firewall_rules.toggle": {
+  "access": "destructive",
+  "required": [
+   "action",
+   "domain_id",
+   "rule_id"
+  ]
+ },
+ "waap.domains.firewall_rules.update": {
+  "access": "write",
+  "required": [
+   "rule_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.get": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.insight_silences.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "author",
+   "comment",
+   "insight_type",
+   "labels"
+  ]
+ },
+ "waap.domains.insight_silences.delete": {
+  "access": "destructive",
+  "required": [
+   "silence_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.insight_silences.get": {
+  "access": "read",
+  "required": [
+   "silence_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.insight_silences.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.insight_silences.update": {
+  "access": "write",
+  "required": [
+   "silence_id",
+   "domain_id",
+   "author",
+   "comment",
+   "expire_at"
+  ]
+ },
+ "waap.domains.insights.get": {
+  "access": "read",
+  "required": [
+   "insight_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.insights.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.insights.replace": {
+  "access": "destructive",
+  "required": [
+   "insight_id",
+   "domain_id",
+   "status"
+  ]
+ },
+ "waap.domains.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.domains.list_rule_sets": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.policies.get": {
+  "access": "read",
+  "required": [
+   "policy_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.policies.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.policies.update": {
+  "access": "write",
+  "required": [
+   "policy_id",
+   "domain_id",
+   "mode"
+  ]
+ },
+ "waap.domains.policy_overrides.create": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "enabled",
+   "name",
+   "target_ids",
+   "target_type"
+  ]
+ },
+ "waap.domains.policy_overrides.delete": {
+  "access": "destructive",
+  "required": [
+   "policy_override_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.policy_overrides.get": {
+  "access": "read",
+  "required": [
+   "policy_override_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.policy_overrides.list": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.policy_overrides.list_owasp_top_threats_targets": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.policy_overrides.update": {
+  "access": "write",
+  "required": [
+   "policy_override_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.settings.get": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.settings.update": {
+  "access": "write",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.statistics.get_ddos_attacks": {
+  "access": "read",
+  "required": [
+   "domain_id"
+  ]
+ },
+ "waap.domains.statistics.get_ddos_info": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "group_by",
+   "start"
+  ]
+ },
+ "waap.domains.statistics.get_events_aggregated": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "start"
+  ]
+ },
+ "waap.domains.statistics.get_request_details": {
+  "access": "read",
+  "required": [
+   "request_id",
+   "domain_id"
+  ]
+ },
+ "waap.domains.update": {
+  "access": "write",
+  "required": [
+   "domain_id",
+   "status"
+  ]
+ },
+ "waap.filter_templates.create": {
+  "access": "write",
+  "required": [
+   "filter_config",
+   "name"
+  ]
+ },
+ "waap.filter_templates.delete": {
+  "access": "destructive",
+  "required": [
+   "template_id"
+  ]
+ },
+ "waap.filter_templates.get": {
+  "access": "read",
+  "required": [
+   "template_id"
+  ]
+ },
+ "waap.filter_templates.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.filter_templates.update": {
+  "access": "write",
+  "required": [
+   "template_id"
+  ]
+ },
+ "waap.firewall_rules.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.get_account_overview": {
+  "access": "read",
+  "required": []
+ },
+ "waap.insights.list_types": {
+  "access": "read",
+  "required": []
+ },
+ "waap.ip_info.get_account_attack_time_series": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_account_counts": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_account_top_user_agents": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_attack_time_series": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_blocked_requests": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_ddos_attack_series": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_ip_info": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_attacks": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_domains": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_paths": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_urls": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_user_agents": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "ip"
+  ]
+ },
+ "waap.ip_info.get_top_user_sessions": {
+  "access": "read",
+  "required": [
+   "domain_id",
+   "ip"
+  ]
+ },
+ "waap.ip_info.list_attacked_countries": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_info.metrics.list": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.ip_reputation.clear_local_tags": {
+  "access": "destructive",
+  "required": [
+   "items"
+  ]
+ },
+ "waap.ip_reputation.list": {
+  "access": "read",
+  "required": [
+   "ip"
+  ]
+ },
+ "waap.organizations.list": {
+  "access": "read",
+  "required": []
+ },
+ "waap.prebilling.get_total": {
+  "access": "read",
+  "required": [
+   "metric",
+   "from_",
+   "to"
+  ]
+ },
+ "waap.statistics.get_usage_series": {
+  "access": "read",
+  "required": [
+   "from_",
+   "granularity",
+   "metrics",
+   "to"
+  ]
+ },
+ "waap.tags.list": {
+  "access": "read",
+  "required": []
+ }
+}

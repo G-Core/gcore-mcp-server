@@ -8,8 +8,10 @@ from gcore import Gcore
 # Type alias for the structure holding inspected resource methods
 ResourceMethodsDict = dict[str, dict[str, dict[str, Any]]]
 
-# Cache for inspected SDK methods
+# Cache for inspected SDK methods. The stored methods are *bound* to the client
+# they were read from, so the cache is only valid for that same client object.
 _resource_methods_cache: ResourceMethodsDict | None = None
+_cached_client: Any = None
 
 
 def _inspect_recursive(
@@ -114,8 +116,8 @@ def inspect_sdk_methods(client: Gcore) -> ResourceMethodsDict:
     Inspect the SDK to discover all available resource methods, including nested ones.
     Uses a cache to avoid re-inspecting on subsequent calls.
     """
-    global _resource_methods_cache
-    if _resource_methods_cache is not None:
+    global _resource_methods_cache, _cached_client
+    if _resource_methods_cache is not None and _cached_client is client:
         return _resource_methods_cache
 
     inspected_methods: ResourceMethodsDict = {}
@@ -193,6 +195,7 @@ def inspect_sdk_methods(client: Gcore) -> ResourceMethodsDict:
                 )
 
     _resource_methods_cache = inspected_methods
+    _cached_client = client
     return inspected_methods
 
 
@@ -204,5 +207,6 @@ def get_all_resources(client: Gcore) -> list[str]:
 
 def clear_inspection_cache() -> None:
     """Clear the inspection cache. Useful for testing."""
-    global _resource_methods_cache
+    global _resource_methods_cache, _cached_client
     _resource_methods_cache = None
+    _cached_client = None
