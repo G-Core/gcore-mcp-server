@@ -1,0 +1,32 @@
+name: Audit
+
+# Checks every locked dependency against the OSV vulnerability database.
+# Runs daily too: advisories are published without any change here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"
+
+      # --locked: audit the committed uv.lock, failing if it is stale.
+      # To accept an advisory with no fix that doesn't affect the server,
+      # add --ignore-until-fixed <ID> with a comment saying why.
+      - name: Audit the locked dependencies
+        run: uv audit --locked --preview-features audit-command

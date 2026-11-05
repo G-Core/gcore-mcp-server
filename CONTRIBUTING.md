@@ -10,6 +10,7 @@ git clone https://github.com/G-Core/gcore-mcp-server.git && cd gcore-mcp-server
 uv sync --all-extras --dev
 uv run pytest            # unit + protocol tests (live tests skip without a key)
 uv run ruff check . && uv run pyright
+uv audit --preview-features audit-command   # known vulnerabilities in uv.lock (CI runs it daily)
 npx @modelcontextprotocol/inspector uv run gcore-mcp-server   # poke at it by hand
 ```
 
