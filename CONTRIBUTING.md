@@ -165,9 +165,9 @@ release, made automatically when it is merged:
 1. **In the PR,** raise the version above the latest release and say what users
    get:
    - set `version = "X.Y.Z"` in `pyproject.toml` and run `uv lock`;
-   - move the `## [Unreleased]` entries in `CHANGELOG.md` under a new
-     `## [X.Y.Z] - YYYY-MM-DD` heading. That section becomes the release notes,
-     so write it for users: what they get, not how it was built;
+   - add a `## [X.Y.Z] - YYYY-MM-DD` section at the top of `CHANGELOG.md`
+     (there is no Unreleased section). It becomes the release notes, so write
+     it for users: what they get, not how it was built;
    - change the example tag in the README (`…/gcore-mcp-server.git@vX.Y.Z`).
 
    CI fails the PR if the version isn't above the latest release

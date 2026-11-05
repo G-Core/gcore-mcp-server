@@ -10,8 +10,8 @@ All notable changes to this project are documented here. The format follows
 - **patch:** fixes.
 
 Each release lists the gcore SDK version it was built and tested against.
-
-## [Unreleased]
+Every change to the server is released when it is merged, so there is no
+Unreleased section: the pull request adds its version's section at the top.
 
 ## [1.1.0] - 2026-11-05
 

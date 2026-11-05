@@ -46,13 +46,15 @@ def _locked(package: str) -> str:
 
 
 def _released_section() -> tuple[str, str]:
-    """Version and body of the newest released section of CHANGELOG.md."""
+    """Version and body of the newest (first) section of CHANGELOG.md.
+
+    There is no Unreleased section: each change to the server is a release.
+    """
     changelog = _read("CHANGELOG.md")
     sections = re.split(r"^## ", changelog, flags=re.M)[1:]
-    released = [s for s in sections if not s.startswith("[Unreleased]")]
-    assert released, "CHANGELOG.md has no released section"
-    version = _one(r"^\[([^\]]+)\]", released[0], "CHANGELOG.md heading")
-    return version, released[0]
+    assert sections, "CHANGELOG.md has no release section"
+    version = _one(r"^\[([^\]]+)\]", sections[0], "CHANGELOG.md heading")
+    return version, sections[0]
 
 
 def test_installed_package_matches_pyproject() -> None:
@@ -144,9 +146,7 @@ def test_version_check_rules(
     from packaging.version import Version
 
     check = _check_version()
-    changelog = (
-        "## [Unreleased]\n\n## [1.1.0] - x\n\n## [1.0.1] - x\n\n## [1.0.0] - x\n"
-    )
+    changelog = "## [1.1.0] - x\n\n## [1.0.1] - x\n\n## [1.0.0] - x\n"
     got_release, got_error = check.decide(
         Version(version), Version(latest) if latest else None, server_changed, changelog
     )
