@@ -55,7 +55,7 @@ reportMissingImports = true
 
 [tool.pytest]
 testpaths = ["tests"]
-python_files = "test_*.py"
+python_files = ["test_*.py"]
 markers = ["live: talks to the real Gcore API (skipped without a key)"]
 
 [dependency-groups]
