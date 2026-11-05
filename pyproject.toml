@@ -35,6 +35,9 @@ namespaces = true
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.uv]
+required-version = ">=0.13.5"
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"
