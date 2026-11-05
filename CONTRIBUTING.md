@@ -139,10 +139,15 @@ and review what changed.
    - `uv run python -m tests.live.sweep`, which writes `reports/LIVE_SWEEP.md`.
    - `uv run python -m tests.live.run_scenarios run --tier extended` (see
      [Live scenarios](#live-scenarios)).
-7. **Add a changelog entry** under `## [Unreleased]` in `CHANGELOG.md`: the new
-   SDK version, plus operations that were added, removed or reclassified.
-8. **Commit** `pyproject.toml`, `uv.lock`, `tests/snapshots/catalog.json`,
-   `docs/OPERATIONS.md` and `CHANGELOG.md` together, with the snapshot diff summarized in the message.
+7. **Make it a release.** The upgrade changes `pyproject.toml`, so merging it
+   releases a new version (see [Releasing](#releasing)): raise the minor version
+   and add its `## [X.Y.Z] - YYYY-MM-DD` section to `CHANGELOG.md`, saying
+   "Built and tested against gcore SDK 0.62.0." and listing the operations that
+   were added, removed or reclassified. `tests/test_versions.py` checks that the
+   newest section names the pinned SDK.
+8. **Commit** `pyproject.toml`, `uv.lock`, `README.md` (the example tag),
+   `tests/snapshots/catalog.json`, `docs/OPERATIONS.md` and `CHANGELOG.md`
+   together, with the snapshot diff summarized in the message.
 
 ## Releasing
 

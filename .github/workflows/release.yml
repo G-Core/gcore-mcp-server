@@ -76,15 +76,15 @@ jobs:
 
       - name: Install dependencies
         if: steps.plan.outputs.release == 'true'
-        run: uv sync --frozen --all-extras --dev
+        run: uv sync --locked --all-extras --dev
 
       - name: Lint and type-check
         if: steps.plan.outputs.release == 'true'
-        run: uv run ruff check . && uv run ruff format --check . && uv run pyright
+        run: uv run --locked ruff check . && uv run --locked ruff format --check . && uv run --locked pyright
 
       - name: Test
         if: steps.plan.outputs.release == 'true'
-        run: uv run pytest
+        run: uv run --locked pytest
 
       - name: Build
         if: steps.plan.outputs.release == 'true'

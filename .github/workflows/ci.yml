@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -27,10 +30,12 @@ jobs:
             **/uv.lock
       
       - name: Install dependencies
-        run: uv sync --frozen --all-extras --dev --python ${{ matrix.python-version }}
+        run: uv sync --locked --all-extras --dev --python ${{ matrix.python-version }}
       
+      # --locked: fail on a uv.lock that doesn't match pyproject.toml instead
+      # of quietly re-locking it (tests/test_versions.py reads the lockfile).
       - name: Run tests
-        run: uv run pytest --ignore=tests/test_e2e_smoke.py --junitxml=pytest-report.xml
+        run: uv run --locked pytest --ignore=tests/test_e2e_smoke.py --junitxml=pytest-report.xml
       
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
