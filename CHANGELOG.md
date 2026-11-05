@@ -25,13 +25,6 @@ Built and tested against gcore SDK 0.61.0.
 - **Releases are published automatically:** each release is tagged and
   published on GitHub, with its wheel and sdist, as soon as it is merged.
 
-### Fixed
-
-- **The macOS Keychain setup in the README stores the whole API key.** The
-  `-w` prompt of `security add-generic-password` keeps only the first 128
-  characters, shorter than a Gcore key; the key is now read without echo and
-  passed on stdin.
-
 ## [1.0.0] - 2026-11-05
 
 The Gcore MCP server, rebuilt on the official `gcore` Python SDK: the whole

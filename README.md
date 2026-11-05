@@ -30,12 +30,8 @@ profile, ideally from a secret store rather than as a literal. For example, on
 macOS with the Keychain:
 
 ```bash
-# once: store the key. It's read without echo and passed on stdin, so it stays
-# out of shell history and the process list. (Don't use the `-w` prompt of
-# add-generic-password: it cuts input at 128 characters, shorter than a key.)
-printf 'API key: '; read -rs KEY; echo
-printf 'add-generic-password -U -a "%s" -s gcore-api-key -w "%s"\n' "$USER" "$KEY" | security -i
-unset KEY
+# once: store the key (the -w prompt keeps it out of shell history)
+security add-generic-password -a "$USER" -s gcore-api-key -w
 # in ~/.zshrc or ~/.bashrc
 export GCORE_API_KEY="$(security find-generic-password -s gcore-api-key -w)"
 ```
