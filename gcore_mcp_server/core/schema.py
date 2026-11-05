@@ -90,7 +90,7 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
         return str
 
     # SDK-specific types to filter out
-    sdk_types = {Omit, NotGiven, type(None)}
+    sdk_types: set[Any] = {Omit, NotGiven, type(None)}
     if Timeout is not None:
         sdk_types.add(Timeout)
     sdk_type_names = {"Omit", "NotGiven", "Timeout"}
@@ -98,7 +98,7 @@ def normalize_sdk_type_for_mcp(param_type: Any) -> Any:
     # Handle Union types (both Union[...] and T | U syntax) with SDK-specific markers
     if origin is Union or origin is types.UnionType:
         # Filter out SDK-specific types
-        actual_args = []
+        actual_args: list[Any] = []
         for arg in args:
             # Check if arg is an SDK-specific class
             if arg in sdk_types:

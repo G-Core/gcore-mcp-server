@@ -215,3 +215,9 @@ def sample_type_annotations():
         "typeddict_type": MockVolumeSpec,
         "complex_list": list[MockVolumeSpec],
     }
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers", "live: talks to the real Gcore API (skipped without a key)"
+    )

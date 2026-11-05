@@ -12,8 +12,7 @@ from gcore_mcp_server.core.inspection import (
     clear_inspection_cache,
 )
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
-from gcore_mcp_server.config.settings import generate_short_tool_name
-from gcore_mcp_server.server import make_wrapper
+from gcore_mcp_server.catalog.typed import build_typed_function
 from fastmcp.tools import Tool
 
 
@@ -204,30 +203,6 @@ class TestE2ESmoke:
                     f"normalize_sdk_type_for_mcp raised exception for {test_type}: {e}"
                 )
 
-    def test_generate_short_tool_name_no_exceptions(self):
-        """Test that generate_short_tool_name handles various tool names without exceptions."""
-        test_names = [
-            "cloud.instances.create",
-            "cloud.networks.subnets.list",
-            "cloud.load_balancers.listeners.delete",
-            "very.long.tool.name.with.many.segments.that.should.be.shortened",
-        ]
-
-        for test_name in test_names:
-            try:
-                result = generate_short_tool_name(test_name)
-                assert isinstance(result, str), (
-                    f"Result should be string for {test_name}"
-                )
-                assert len(result) <= 60, (
-                    f"Result should be ≤60 chars for {test_name}, got {len(result)}"
-                )
-
-            except Exception as e:
-                pytest.fail(
-                    f"generate_short_tool_name raised exception for {test_name}: {e}"
-                )
-
     def test_full_e2e_integration_smoke(self):
         """Full integration test from SDK to tool generation (smoke test)."""
         try:
@@ -252,10 +227,7 @@ class TestE2ESmoke:
             methods_list = list(iter_sdk_methods(client))
             assert isinstance(methods_list, list), "iter_sdk_methods should return list"
 
-            # Test tool name shortening for a few methods
-            for full_name, method_obj in methods_list[:5]:  # Test first 5 methods
-                short_name = generate_short_tool_name(full_name)
-                assert isinstance(short_name, str), "Short name should be string"
+            for _full_name, method_obj in methods_list[:5]:
                 assert callable(method_obj), "Method should be callable"
 
         except Exception as e:
@@ -291,94 +263,39 @@ class TestE2ESmoke:
             pytest.fail(f"Caching behavior test failed: {e}")
 
     def test_cost_reports_schema_generation(self):
-        """Test that cloud.cost_reports.get_aggregated generates correct array schema."""
+        """cloud.cost_reports.get_breakdown exposes `project_ids` as an int array."""
         client = Gcore(api_key="test-key")
+        method = dict(iter_sdk_methods(client))["cloud.cost_reports.get_breakdown"]
+        fn, _ = build_typed_function(method, "cloud.cost_reports.get_breakdown", {}, "")
 
-        # Find the cost_reports.get_aggregated method
-        method = None
-        for full_name, sdk_method in iter_sdk_methods(client):
-            if (
-                "cost_reports.get_aggregated" in full_name
-                and "monthly" not in full_name
-            ):
-                method = sdk_method
-                break
-
-        assert method is not None, "cloud.cost_reports.get_aggregated not found"
-
-        # Create wrapper and check annotations
-        wrapper = make_wrapper(
-            method, "cloud.cost_reports.get_aggregated", False, False
-        )
-
-        # Check that wrapper has proper type annotations
-        annotations = wrapper.__annotations__
-        assert "projects" in annotations
-        assert "time_from" in annotations
-        assert "time_to" in annotations
-
-        # Create FastMCP tool and check schema
-        tool = Tool.from_function(wrapper, name="test_cost_reports", description="Test")
-        mcp_tool = tool.to_mcp_tool()
-        schema = mcp_tool.model_dump(by_alias=True)
-
-        # Verify projects parameter schema
-        projects_schema = schema["inputSchema"]["properties"]["projects"]
-
-        # Should be anyOf with array and null (optional array)
-        assert "anyOf" in projects_schema, (
-            f"Expected anyOf in projects schema, got: {projects_schema}"
-        )
-
-        # Find the array type in anyOf
+        tool = Tool.from_function(fn, name="test_cost_reports", description="Test")
+        schema = tool.to_mcp_tool().model_dump(by_alias=True)
+        props = schema["inputSchema"]["properties"]
+        assert "time_from" in props and "time_to" in props
+        projects_schema = props["project_ids"]
         array_schemas = [
-            s for s in projects_schema["anyOf"] if s.get("type") == "array"
+            s
+            for s in projects_schema.get("anyOf", [projects_schema])
+            if s.get("type") == "array"
         ]
-        assert len(array_schemas) >= 1, (
-            f"Expected at least one array schema, got: {projects_schema}"
-        )
-
-        # Check array items are integers
-        array_schema = array_schemas[0]
-        assert "items" in array_schema, (
-            f"Expected items in array schema, got: {array_schema}"
-        )
-        assert array_schema["items"]["type"] == "integer", (
-            f"Expected integer items, got: {array_schema['items']}"
-        )
+        assert array_schemas, f"Expected an array schema, got: {projects_schema}"
+        assert array_schemas[0]["items"]["type"] == "integer"
 
     def test_wrapper_preserves_array_types(self):
-        """Test that wrapper properly preserves array parameter types."""
-        from typing import List, Union
+        """Optional SDK list parameters become `list[int] | None`."""
+        from typing import Annotated, List, Union, get_args, get_origin
+        import types
         from gcore import Omit
 
-        # Create a mock method with array parameter
-        def mock_method(projects: Union[List[int], Omit] = Omit()) -> dict:
+        def mock_method(*, projects: Union[List[int], Omit] = Omit()) -> dict:
             """Mock method for testing."""
             return {"projects": projects}
 
-        # Add type hints
-        mock_method.__annotations__ = {
-            "projects": Union[List[int], Omit],
-            "return": dict,
-        }
-
-        # Create wrapper
-        wrapper = make_wrapper(mock_method, "test.mock_method", False, False)
-
-        # Check wrapper annotations
-        annotations = wrapper.__annotations__
-        assert "projects" in annotations
-
-        # projects should be List[int] | None after normalization
-        from typing import get_origin, get_args
-        import types
-
-        projects_type = annotations["projects"]
-        # Handle both Union and UnionType (T | U syntax)
+        fn, _ = build_typed_function(mock_method, "test.mock_method", {}, "")
+        projects_type = fn.__annotations__["projects"]
+        if get_origin(projects_type) is Annotated:
+            projects_type = get_args(projects_type)[0]
         assert get_origin(projects_type) in (Union, types.UnionType)
-
-        # Should have List[int] and None
         args = get_args(projects_type)
         assert type(None) in args
         list_args = [arg for arg in args if arg is not type(None)]
