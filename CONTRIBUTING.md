@@ -156,10 +156,12 @@ operations (the changelog lists them). Fixes bump the patch version. The version
 Releases are tagged by hand after merging to `main`:
 
 1. In a PR, move the `## [Unreleased]` entries in `CHANGELOG.md` under a new
-   `## [X.Y.Z] - YYYY-MM-DD` heading, set `version = "X.Y.Z"` in `pyproject.toml`
-   and run `uv lock`. Merge it to `main`.
-2. Check that the merge commit is the one to release and that CI passed on it.
-   Check also that the version matches, because nothing else checks it:
+   `## [X.Y.Z] - YYYY-MM-DD` heading, set `version = "X.Y.Z"` in `pyproject.toml`,
+   change the example tag in the README (`…/gcore-mcp-server.git@vX.Y.Z`) and run
+   `uv lock`. Merge it to `main`. `tests/test_versions.py` fails CI if any of
+   these, the installed package, or the SDK version stated in the changelog and
+   `docs/OPERATIONS.md`, disagrees with `pyproject.toml`.
+2. Check that the merge commit is the one to release and that CI passed on it:
    ```bash
    git checkout main && git pull
    uv run gcore-mcp-server --version   # must print X.Y.Z

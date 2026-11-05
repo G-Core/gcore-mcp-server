@@ -13,6 +13,12 @@ Each release lists the gcore SDK version it was built and tested against.
 
 ## [Unreleased]
 
+### Changed
+
+- **The server states its own version** in its instructions to the model
+  (`gcore-mcp-server <version>: …`), next to the SDK version, so a model asked
+  which version it is talking to can answer.
+
 ## [1.0.0] - 2026-11-05
 
 The Gcore MCP server, rebuilt on the official `gcore` Python SDK: the whole

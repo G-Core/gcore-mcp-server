@@ -117,8 +117,8 @@ def build_instructions(
     """Server instructions: the workflow plus this server's configuration."""
     services = ", ".join(f"{s} ({n})" for s, n in sorted(catalog.services().items()))
     lines = [
-        f"Gcore cloud API via the official Python SDK v{gcore.__version__}: "
-        f"{len(catalog.entries)} operations - {services}.",
+        f"gcore-mcp-server {__version__}: the Gcore API via the official Python "
+        f"SDK v{gcore.__version__}, {len(catalog.entries)} operations - {services}.",
     ]
     if config.mode is Mode.DYNAMIC and policy.read_only:
         lines.append(
