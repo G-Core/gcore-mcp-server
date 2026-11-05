@@ -13,11 +13,17 @@ Each release lists the gcore SDK version it was built and tested against.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-05
+
+Built and tested against gcore SDK 0.61.0.
+
 ### Changed
 
 - **The server states its own version** in its instructions to the model
   (`gcore-mcp-server <version>: …`), next to the SDK version, so a model asked
   which version it is talking to can answer.
+- **Releases are published automatically:** each release is tagged and
+  published on GitHub, with its wheel and sdist, as soon as it is merged.
 
 ## [1.0.0] - 2026-11-05
 

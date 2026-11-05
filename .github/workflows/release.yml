@@ -1,0 +1,133 @@
+name: Release
+
+# A merge to main whose pyproject.toml version has no tag yet is released:
+# tested, built, tagged vX.Y.Z on that commit and published as a GitHub release
+# with its CHANGELOG.md section as the notes. CI makes a PR that changes the
+# server raise the version (scripts/check_version.py), so a merge releases it.
+# Pushing a vX.Y.Z tag by hand releases that tag the same way. The wheel and
+# sdist are attached; the package is not published to PyPI.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.plan.outputs.release }}
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the tags
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.5"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Decide whether to release
+        id: plan
+        run: |
+          version="$(uv run --no-project python -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+              echo "::error::tag ${GITHUB_REF_NAME} does not match pyproject version ${version}"
+              exit 1
+            fi
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          elif git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
+            echo "v${version} is already released; nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            uv run --no-project --with packaging python scripts/check_version.py | grep '^release=' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Release notes from CHANGELOG.md
+        if: steps.plan.outputs.release == 'true'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          awk -v v="${VERSION}" '
+            $0 ~ "^## \\[" v "\\]" {on=1; next}
+            on && /^## \[/ {exit}
+            on {print}
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for ${VERSION}"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        if: steps.plan.outputs.release == 'true'
+        run: uv sync --frozen --all-extras --dev
+
+      - name: Lint and type-check
+        if: steps.plan.outputs.release == 'true'
+        run: uv run ruff check . && uv run ruff format --check . && uv run pyright
+
+      - name: Test
+        if: steps.plan.outputs.release == 'true'
+        run: uv run pytest
+
+      - name: Build
+        if: steps.plan.outputs.release == 'true'
+        run: uv build
+
+      - uses: actions/upload-artifact@v4
+        if: steps.plan.outputs.release == 'true'
+        with:
+          name: dist
+          path: |
+            dist/
+            release-notes.md
+
+  github-release:
+    needs: build
+    if: needs.build.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: v${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        if: github.ref_type == 'branch'
+
+      - name: Tag the merged commit
+        if: github.ref_type == 'branch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "${TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${TAG}"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${TAG}" dist/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --verify-tag \
+            --title "${TAG}" \
+            --notes-file release-notes.md

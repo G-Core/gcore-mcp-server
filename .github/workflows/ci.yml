@@ -39,3 +39,27 @@ jobs:
           path: pytest-report.xml
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
+
+  version:
+    # A PR that changes the server must raise the version above the latest
+    # release (merging it releases that version); see scripts/check_version.py.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the tags and the base branch
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.5"
+
+      - name: Check the version against the latest release
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "${BASE_REF}" ]; then
+            uv run --no-project --with packaging python scripts/check_version.py --base "origin/${BASE_REF}"
+          else
+            uv run --no-project --with packaging python scripts/check_version.py
+          fi

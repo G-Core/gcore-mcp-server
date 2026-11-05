@@ -107,3 +107,61 @@ async def test_server_states_both_versions(anyio_backend: str) -> None:
 @pytest.fixture
 def anyio_backend() -> str:
     return "asyncio"
+
+
+def _check_version():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "check_version", ROOT / "scripts" / "check_version.py"
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.parametrize(
+    ("version", "latest", "server_changed", "release", "error"),
+    [
+        ("1.0.1", "1.0.0", True, True, None),  # a bumped fix releases
+        ("1.0.0", "1.0.0", False, False, None),  # docs only: no release
+        ("1.0.0", "1.0.0", True, False, "raise the version"),  # forgot the bump
+        ("0.9.0", "1.0.0", False, False, "below the latest"),
+        ("1.1.0", None, True, True, None),  # first release
+        ("1.0.2", "1.0.0", True, False, "no '## [1.0.2]'"),  # no notes
+    ],
+)
+def test_version_check_rules(
+    version: str,
+    latest: str | None,
+    server_changed: bool,
+    release: bool,
+    error: str | None,
+) -> None:
+    from packaging.version import Version
+
+    check = _check_version()
+    changelog = (
+        "## [Unreleased]\n\n## [1.1.0] - x\n\n## [1.0.1] - x\n\n## [1.0.0] - x\n"
+    )
+    got_release, got_error = check.decide(
+        Version(version), Version(latest) if latest else None, server_changed, changelog
+    )
+    assert got_release is release
+    if error is None:
+        assert got_error is None
+    else:
+        assert got_error and error in got_error
+
+
+def test_version_check_paths_and_tags() -> None:
+    check = _check_version()
+    assert check.changes_server(["gcore_mcp_server/server.py"])
+    assert check.changes_server(["README.md", "pyproject.toml"])
+    assert not check.changes_server(["README.md", "tests/test_x.py", "uv.lock"])
+    assert (
+        str(check.latest_release(["v1.0.0", "v1.10.0", "v1.9.3", "x", "vbad"]))
+        == "1.10.0"
+    )
+    assert check.latest_release([]) is None
