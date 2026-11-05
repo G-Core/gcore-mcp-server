@@ -8,6 +8,7 @@ them.
 from __future__ import annotations
 
 import re
+import tomllib
 from pathlib import Path
 
 import gcore
@@ -28,10 +29,11 @@ def _one(pattern: str, text: str, where: str) -> str:
     return found.group(1)
 
 
-# tomllib needs Python 3.11; the project supports 3.10.
-PYPROJECT = _read("pyproject.toml")
-VERSION = _one(r'^version = "([^"]+)"', PYPROJECT, "pyproject.toml")
-SDK_PIN = _one(r'"gcore==([^"]+)"', PYPROJECT, "pyproject.toml gcore pin")
+PROJECT = tomllib.loads(_read("pyproject.toml"))["project"]
+VERSION: str = PROJECT["version"]
+SDK_PIN = next(
+    d.split("==")[1] for d in PROJECT["dependencies"] if d.startswith("gcore==")
+)
 
 
 def _locked(package: str) -> str:

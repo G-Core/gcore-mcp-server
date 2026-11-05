@@ -3,11 +3,7 @@
 import os
 from typing import Any, TypedDict, Optional, Union, Literal
 
-# Required and NotRequired live in typing (Python ≥3.11). For Python 3.10 fallback to typing_extensions.
-try:
-    from typing import Required, NotRequired  # type: ignore
-except ImportError:  # Python < 3.11
-    from typing_extensions import Required, NotRequired  # type: ignore
+from typing import NotRequired, Required
 
 from unittest.mock import Mock
 from inspect import Parameter, Signature

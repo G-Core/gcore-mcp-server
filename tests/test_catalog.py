@@ -282,6 +282,21 @@ Args:
     assert doc.args["project_id"] == "Project ID"
 
 
+def test_docstring_parsing_keeps_indented_docstrings() -> None:
+    """Python <3.13 keeps a docstring's indentation; the sections still parse."""
+    doc = parse_docstring(
+        """Get a thing
+
+        Args:
+          name: The name.
+
+          extra_headers: Send extra headers
+        """
+    )
+    assert doc.summary == doc.description == "Get a thing"
+    assert doc.args["name"] == "The name."
+
+
 def test_catalog_snapshot_matches_installed_sdk() -> None:
     """Golden file of every operation, its access class and required params.
 

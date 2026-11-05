@@ -13,9 +13,15 @@ Each release lists the gcore SDK version it was built and tested against.
 
 ## [Unreleased]
 
-## [1.0.1] - 2026-11-05
+## [1.1.0] - 2026-11-05
 
-Built and tested against gcore SDK 0.61.0.
+Built and tested against gcore SDK 0.61.0, on Python 3.11 to 3.15.
+
+### Removed
+
+- **Python 3.10 support: Python 3.11 or later is required.** Python 3.10 has reached end of life,
+  and its dependencies can no longer get security fixes (dnspython 2.9 needs
+  3.11).
 
 ### Changed
 
@@ -24,6 +30,12 @@ Built and tested against gcore SDK 0.61.0.
   which version it is talking to can answer.
 - **Releases are published automatically:** each release is tagged and
   published on GitHub, with its wheel and sdist, as soon as it is merged.
+
+### Fixed
+
+- **Operation descriptions on Python 3.11 and 3.12 no longer include the
+  argument docs.** Search results and tool descriptions now show the same short
+  summaries as on newer Pythons.
 
 ## [1.0.0] - 2026-11-05
 
