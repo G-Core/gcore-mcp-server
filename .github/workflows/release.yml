@@ -93,16 +93,9 @@ jobs:
         if: steps.plan.outputs.release == 'true'
         env:
           VERSION: ${{ steps.plan.outputs.version }}
-        run: |
-          awk -v v="${VERSION}" '
-            $0 ~ "^## \\[" v "\\]" {on=1; next}
-            on && /^## \[/ {exit}
-            on {print}
-          ' CHANGELOG.md > release-notes.md
-          if [ ! -s release-notes.md ]; then
-            echo "::error::CHANGELOG.md has no section for ${VERSION}"
-            exit 1
-          fi
+        # The section with its wrapped lines joined: GitHub shows each line
+        # break in a release body as a break.
+        run: uv run --no-project python scripts/release_notes.py "${VERSION}" > release-notes.md
 
       - name: Audit the locked dependencies
         if: steps.plan.outputs.release == 'true'
