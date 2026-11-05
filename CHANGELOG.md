@@ -13,6 +13,14 @@ Each release lists the gcore SDK version it was built and tested against.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Keychain example in the README stores the whole API key.** It typed
+  the key at the prompt of `security add-generic-password -w`, which keeps only
+  the first 128 characters. A Gcore API key is longer, so the stored key was
+  cut short and every call failed with 401. The example now reads the key with
+  `read -s` and passes it to `security`.
+
 ## [1.0.0] - 2026-11-05
 
 The Gcore MCP server, rebuilt on the official `gcore` Python SDK: the whole
