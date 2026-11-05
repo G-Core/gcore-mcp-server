@@ -593,21 +593,6 @@ def test_cli_list_needs_no_key(
     assert "cloud." not in out
 
 
-async def test_server_reports_its_own_version() -> None:
-    import re
-    from pathlib import Path
-
-    from gcore_mcp_server import __version__
-
-    # tomllib needs Python 3.11; the project supports 3.10.
-    pyproject = (Path(__file__).parents[1] / "pyproject.toml").read_text()
-    declared = re.search(r'^version = "([^"]+)"', pyproject, re.M)
-    assert declared and __version__ == declared.group(1)
-    async with Client(make_server()) as client:
-        info = client.server_info or (await client.initialize()).serverInfo
-        assert info is not None and info.version == __version__
-
-
 async def test_requests_carry_the_server_user_agent(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import re
 from dataclasses import dataclass, field
 
@@ -33,7 +34,9 @@ def parse_docstring(doc: str | None) -> ParsedDoc:
     if not doc:
         return ParsedDoc(summary="", description="")
 
-    lines = doc.expandtabs().splitlines()
+    # Python 3.13+ strips docstring indentation at compile time; older
+    # versions keep it, and section headers must start at column 0 here.
+    lines = inspect.cleandoc(doc).splitlines()
     body: list[str] = []
     args: dict[str, list[str]] = {}
     section: str | None = None

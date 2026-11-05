@@ -10,11 +10,32 @@ All notable changes to this project are documented here. The format follows
 - **patch:** fixes.
 
 Each release lists the gcore SDK version it was built and tested against.
+Every change to the server is released when it is merged, so there is no
+Unreleased section: the pull request adds its version's section at the top.
 
-## [Unreleased]
+## [1.1.0] - 2026-11-05
+
+Built and tested against gcore SDK 0.61.0, on Python 3.11 to 3.15.
+
+### Removed
+
+- **Python 3.10 support: Python 3.11 or later is required.** Python 3.10 has
+  reached end of life, and its dependencies can no longer get security fixes
+  (dnspython 2.9 needs 3.11).
+
+### Changed
+
+- **The server states its own version** in its instructions to the model
+  (`gcore-mcp-server <version>: …`), next to the SDK version, so a model asked
+  which version it is talking to can answer.
+- **Releases are published automatically:** each release is tagged and
+  published on GitHub, with its wheel and sdist, as soon as it is merged.
 
 ### Fixed
 
+- **Operation descriptions on Python 3.11 and 3.12 no longer include the
+  argument docs.** Search results and tool descriptions now show the same short
+  summaries as on newer Pythons.
 - **The Keychain example in the README stores the whole API key.** It typed
   the key at the prompt of `security add-generic-password -w`, which keeps only
   the first 128 characters. A Gcore API key is longer, so the stored key was

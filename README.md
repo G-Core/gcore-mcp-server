@@ -426,7 +426,7 @@ uv tool install "gcore-mcp-server@git+https://github.com/G-Core/gcore-mcp-server
 ```
 
 These commands follow the `main` branch. To pin a release, add its tag to the URL,
-for example `…/gcore-mcp-server.git@v1.0.0`. Releases are listed on the
+for example `…/gcore-mcp-server.git@v1.1.0`. Releases are listed on the
 [releases page](https://github.com/G-Core/gcore-mcp-server/releases).
 
 ## Upgrading

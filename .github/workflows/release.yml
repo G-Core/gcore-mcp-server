@@ -1,0 +1,181 @@
+name: Release
+
+# A merge to main whose pyproject.toml version has no tag yet is released:
+# tested, built, tagged vX.Y.Z on that commit and published as a GitHub release
+# with its CHANGELOG.md section as the notes. CI makes a PR that changes the
+# server raise the version (scripts/check_version.py), so a merge releases it.
+# Pushing a vX.Y.Z tag on a commit of main releases that tag the same way. The
+# wheel and sdist are attached; the package is not published to PyPI.
+#
+# A failed run can be re-run: a version counts as released only once its
+# GitHub release exists, and tagging and publishing skip what's already done.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    # Unlike the implicit default, an explicit bash runs with -eo pipefail, so
+    # a failing command in a pipe fails the step.
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.plan.outputs.release }}
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the tags
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Decide whether to release
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(uv run --no-project python -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+          tag="v${version}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          tagged="$(git rev-parse -q --verify "refs/tags/${tag}^{commit}" || true)"
+
+          if gh release view "${tag}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "${tag} is already released; nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            # A tag pushed by hand: it must name this version and a commit of main.
+            if [ "${GITHUB_REF_NAME}" != "${tag}" ]; then
+              echo "::error::tag ${GITHUB_REF_NAME} does not match pyproject version ${version}"
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then
+              echo "::error::${tag} is not on main; only reviewed commits of main are released"
+              exit 1
+            fi
+          elif [ -n "${tagged}" ]; then
+            # Tagged but not released: a run that failed after tagging. Only a
+            # re-run of that same commit may finish it.
+            if [ "${tagged}" != "${GITHUB_SHA}" ]; then
+              echo "::error::${tag} is tagged on ${tagged} but has no release; re-run the Release workflow for that commit"
+              exit 1
+            fi
+          else
+            uv run --no-project --with packaging python scripts/check_version.py | grep '^release=' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "release=true" >> "$GITHUB_OUTPUT"
+
+      - name: Release notes from CHANGELOG.md
+        if: steps.plan.outputs.release == 'true'
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          awk -v v="${VERSION}" '
+            $0 ~ "^## \\[" v "\\]" {on=1; next}
+            on && /^## \[/ {exit}
+            on {print}
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for ${VERSION}"
+            exit 1
+          fi
+
+      - name: Audit the locked dependencies
+        if: steps.plan.outputs.release == 'true'
+        # Known vulnerabilities block a release. To accept one with no fix that
+        # doesn't affect the server, add --ignore-until-fixed <ID> here and in
+        # audit.yml, with a comment saying why.
+        run: uv audit --locked --preview-features audit-command
+
+      - name: Install dependencies
+        if: steps.plan.outputs.release == 'true'
+        run: uv sync --locked --all-extras --dev
+
+      - name: Lint and type-check
+        if: steps.plan.outputs.release == 'true'
+        run: uv run --locked ruff check . && uv run --locked ruff format --check . && uv run --locked pyright
+
+      - name: Test
+        if: steps.plan.outputs.release == 'true'
+        run: uv run --locked pytest
+
+      - name: Build
+        if: steps.plan.outputs.release == 'true'
+        run: uv build
+
+      - uses: actions/upload-artifact@v4
+        if: steps.plan.outputs.release == 'true'
+        with:
+          name: dist
+          path: |
+            dist/
+            release-notes.md
+
+  github-release:
+    needs: build
+    if: needs.build.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: v${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        if: github.ref_type == 'branch'
+
+      - name: Tag the merged commit
+        if: github.ref_type == 'branch'
+        run: |
+          if git fetch -q --depth=1 origin "refs/tags/${TAG}:refs/tags/${TAG}" 2>/dev/null; then
+            # A re-run after tagging; plan made sure the tag is on this commit.
+            [ "$(git rev-parse "${TAG}^{commit}")" = "${GITHUB_SHA}" ]
+            echo "${TAG} is already on ${GITHUB_SHA}."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "${TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${TAG}"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            # A re-run after the release was created: replace its files.
+            gh release upload "${TAG}" dist/* --repo "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${TAG}" dist/* \
+              --repo "${GITHUB_REPOSITORY}" \
+              --verify-tag \
+              --title "${TAG}" \
+              --notes-file release-notes.md
+          fi

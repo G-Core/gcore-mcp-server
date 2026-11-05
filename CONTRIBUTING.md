@@ -10,6 +10,7 @@ git clone https://github.com/G-Core/gcore-mcp-server.git && cd gcore-mcp-server
 uv sync --all-extras --dev
 uv run pytest            # unit + protocol tests (live tests skip without a key)
 uv run ruff check . && uv run pyright
+uv audit --preview-features audit-command   # known vulnerabilities in uv.lock (CI runs it daily)
 npx @modelcontextprotocol/inspector uv run gcore-mcp-server   # poke at it by hand
 ```
 
@@ -139,10 +140,15 @@ and review what changed.
    - `uv run python -m tests.live.sweep`, which writes `reports/LIVE_SWEEP.md`.
    - `uv run python -m tests.live.run_scenarios run --tier extended` (see
      [Live scenarios](#live-scenarios)).
-7. **Add a changelog entry** under `## [Unreleased]` in `CHANGELOG.md`: the new
-   SDK version, plus operations that were added, removed or reclassified.
-8. **Commit** `pyproject.toml`, `uv.lock`, `tests/snapshots/catalog.json`,
-   `docs/OPERATIONS.md` and `CHANGELOG.md` together, with the snapshot diff summarized in the message.
+7. **Make it a release.** The upgrade changes `pyproject.toml`, so merging it
+   releases a new version (see [Releasing](#releasing)): raise the minor version
+   and add its `## [X.Y.Z] - YYYY-MM-DD` section to `CHANGELOG.md`, saying
+   "Built and tested against gcore SDK 0.62.0." and listing the operations that
+   were added, removed or reclassified. `tests/test_versions.py` checks that the
+   newest section names the pinned SDK.
+8. **Commit** `pyproject.toml`, `uv.lock`, `README.md` (the example tag),
+   `tests/snapshots/catalog.json`, `docs/OPERATIONS.md` and `CHANGELOG.md`
+   together, with the snapshot diff summarized in the message.
 
 ## Releasing
 
@@ -153,26 +159,41 @@ operations (the changelog lists them). Fixes bump the patch version. The version
 `pyproject.toml`, and the server reports it to clients (`gcore-mcp-server
 --version`).
 
-Releases are tagged by hand after merging to `main`:
+Every PR that changes the server (`gcore_mcp_server/` or `pyproject.toml`) is a
+release, made automatically when it is merged:
 
-1. In a PR, move the `## [Unreleased]` entries in `CHANGELOG.md` under a new
-   `## [X.Y.Z] - YYYY-MM-DD` heading, set `version = "X.Y.Z"` in `pyproject.toml`
-   and run `uv lock`. Merge it to `main`.
-2. Check that the merge commit is the one to release and that CI passed on it.
-   Check also that the version matches, because nothing else checks it:
-   ```bash
-   git checkout main && git pull
-   uv run gcore-mcp-server --version   # must print X.Y.Z
-   ```
-3. Tag it and push the tag:
-   ```bash
-   git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z
-   ```
-4. Create the GitHub release with that version's changelog section as notes:
-   ```bash
-   awk -v v="X.Y.Z" '$0 ~ "^## \\[" v "\\]" {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > /tmp/notes.md
-   gh release create vX.Y.Z --title vX.Y.Z --notes-file /tmp/notes.md
-   ```
+1. **In the PR,** raise the version above the latest release and say what users
+   get:
+   - set `version = "X.Y.Z"` in `pyproject.toml` and run `uv lock`;
+   - add a `## [X.Y.Z] - YYYY-MM-DD` section at the top of `CHANGELOG.md`
+     (there is no Unreleased section). It becomes the release notes, so write
+     it for users: what they get, not how it was built;
+   - change the example tag in the README (`…/gcore-mcp-server.git@vX.Y.Z`).
+
+   CI fails the PR if the version isn't above the latest release
+   (`scripts/check_version.py`) or if any copy of it disagrees with
+   `pyproject.toml` (`tests/test_versions.py`). Docs- and tests-only PRs may
+   keep the version and don't release.
+2. **Merge it.** The Release workflow sees a version with no release yet,
+   audits the locked dependencies (`uv audit`), runs the checks and tests, tags
+   the merged commit `vX.Y.Z`, and publishes the GitHub release with the
+   changelog section as notes and the wheel and sdist attached.
+3. **Check** the release on the
+   [releases page](https://github.com/G-Core/gcore-mcp-server/releases).
+
+If the workflow fails, fix the cause and re-run it from the Actions tab: it
+skips the tag or release it already made. A version that's tagged but not
+released blocks later releases until that run is re-run and succeeds.
+
+To release by hand instead, tag the merged commit and push the tag; the same
+workflow then builds and publishes it. Only a tag on a commit of `main` is
+released:
+
+```bash
+git checkout main && git pull
+uv run gcore-mcp-server --version   # must print X.Y.Z
+git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z
+```
 
 Never move or delete a pushed tag: users pin it.
 

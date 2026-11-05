@@ -5,9 +5,17 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The oldest and the newest supported Python.
+        python-version: ["3.11", "3.15"]
     steps:
       - uses: actions/checkout@v4
 
@@ -15,27 +23,48 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
-          version: "0.13.5"
+          version: "0.13.7"
           enable-cache: true
           cache-dependency-glob: |
             **/pyproject.toml
             **/uv.lock
       
-      - name: "Set up Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-      
       - name: Install dependencies
-        run: uv sync --frozen --all-extras --dev
+        run: uv sync --locked --all-extras --dev --python ${{ matrix.python-version }}
       
+      # --locked: fail on a uv.lock that doesn't match pyproject.toml instead
+      # of quietly re-locking it (tests/test_versions.py reads the lockfile).
       - name: Run tests
-        run: uv run pytest --ignore=tests/test_e2e_smoke.py --junitxml=pytest-report.xml
+        run: uv run --locked pytest --ignore=tests/test_e2e_smoke.py --junitxml=pytest-report.xml
       
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-results
+          name: pytest-results-${{ matrix.python-version }}
           path: pytest-report.xml
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
+
+  version:
+    # A PR that changes the server must raise the version above the latest
+    # release (merging it releases that version); see scripts/check_version.py.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the tags and the base branch
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"
+
+      - name: Check the version against the latest release
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "${BASE_REF}" ]; then
+            uv run --no-project --with packaging python scripts/check_version.py --base "origin/${BASE_REF}"
+          else
+            uv run --no-project --with packaging python scripts/check_version.py
+          fi
