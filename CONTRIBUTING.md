@@ -174,15 +174,20 @@ release, made automatically when it is merged:
    (`scripts/check_version.py`) or if any copy of it disagrees with
    `pyproject.toml` (`tests/test_versions.py`). Docs- and tests-only PRs may
    keep the version and don't release.
-2. **Merge it.** The Release workflow sees a version with no tag yet, runs the
-   checks and tests, tags the merged commit `vX.Y.Z`, and publishes the GitHub
-   release with the changelog section as notes and the wheel and sdist
-   attached.
+2. **Merge it.** The Release workflow sees a version with no release yet,
+   audits the locked dependencies (`uv audit`), runs the checks and tests, tags
+   the merged commit `vX.Y.Z`, and publishes the GitHub release with the
+   changelog section as notes and the wheel and sdist attached.
 3. **Check** the release on the
    [releases page](https://github.com/G-Core/gcore-mcp-server/releases).
 
-To release by hand instead (for example if the workflow failed), tag the merged
-commit and push the tag; the same workflow then builds and publishes it:
+If the workflow fails, fix the cause and re-run it from the Actions tab: it
+skips the tag or release it already made. A version that's tagged but not
+released blocks later releases until that run is re-run and succeeds.
+
+To release by hand instead, tag the merged commit and push the tag; the same
+workflow then builds and publishes it. Only a tag on a commit of `main` is
+released:
 
 ```bash
 git checkout main && git pull
