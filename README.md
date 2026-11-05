@@ -30,11 +30,17 @@ profile, ideally from a secret store rather than as a literal. For example, on
 macOS with the Keychain:
 
 ```bash
-# once: store the key (the -w prompt keeps it out of shell history)
-security add-generic-password -a "$USER" -s gcore-api-key -w
+# once: store the key (read -s keeps it off the screen and out of shell history)
+read -rs "k?Gcore API key: " && security add-generic-password -U -a "$USER" -s gcore-api-key -w "$k"; unset k
 # in ~/.zshrc or ~/.bashrc
 export GCORE_API_KEY="$(security find-generic-password -s gcore-api-key -w)"
 ```
+
+In bash, use `read -rsp "Gcore API key: " k` instead. `-U` replaces a key you
+stored before. Don't type the key at the prompt of
+`security add-generic-password -w` itself: that prompt keeps only the first 128
+characters, and a Gcore API key is longer, so the stored key is cut short and
+every call fails with 401.
 
 Clients only see variables that were exported in the environment they were started
 from, so start the client from a shell that has the variable, or restart it after

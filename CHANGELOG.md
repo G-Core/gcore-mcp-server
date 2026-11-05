@@ -19,9 +19,9 @@ Built and tested against gcore SDK 0.61.0, on Python 3.11 to 3.15.
 
 ### Removed
 
-- **Python 3.10 support: Python 3.11 or later is required.** Python 3.10 has reached end of life,
-  and its dependencies can no longer get security fixes (dnspython 2.9 needs
-  3.11).
+- **Python 3.10 support: Python 3.11 or later is required.** Python 3.10 has
+  reached end of life, and its dependencies can no longer get security fixes
+  (dnspython 2.9 needs 3.11).
 
 ### Changed
 
@@ -36,6 +36,11 @@ Built and tested against gcore SDK 0.61.0, on Python 3.11 to 3.15.
 - **Operation descriptions on Python 3.11 and 3.12 no longer include the
   argument docs.** Search results and tool descriptions now show the same short
   summaries as on newer Pythons.
+- **The Keychain example in the README stores the whole API key.** It typed
+  the key at the prompt of `security add-generic-password -w`, which keeps only
+  the first 128 characters. A Gcore API key is longer, so the stored key was
+  cut short and every call failed with 401. The example now reads the key with
+  `read -s` and passes it to `security`.
 
 ## [1.0.0] - 2026-11-05
 
