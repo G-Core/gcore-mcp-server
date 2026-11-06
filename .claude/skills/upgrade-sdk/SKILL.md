@@ -78,13 +78,48 @@ git grep -n "<old count>" -- ':!uv.lock' ':!tests/snapshots' ':!CHANGELOG.md'
 
 - `README.md`: "N are listed in docs/OPERATIONS.md", the `direct`,
   `GCORE_TOOLS=*` row of the tool-definition table (tool count and its o200k
-  token figure - re-measure it with `tests/helpers.py::tool_tokens` on a
-  direct-mode server with `GCORE_TOOLS=*`, the way `tests/test_protocol.py`
-  builds one), and "~N operations" in the dynamic row if it drifts.
+  token figure), and "~N operations" in the dynamic row if it drifts.
+  Measure the token figure with this script (put it in the scratchpad, run it
+  from the repo root with `uv run python <script>`):
+  ```python
+  import anyio
+  from fastmcp import Client
+  from gcore_mcp_server.config.server_config import Mode
+  from tests.helpers import make_server, tool_tokens
+
+  async def main():
+      async with Client(make_server(Mode.DIRECT, tools="*")) as c:
+          tools = await c.list_tools()
+          print(len(tools), tool_tokens(tools))
+  anyio.run(main)
+  ```
 - `README.md`: the install example tag (`…/gcore-mcp-server.git@vX.Y.Z`) -> the
   new server version.
-- `CONTRIBUTING.md`: the `"gcore==…"` example in the upgrade section.
+- `CONTRIBUTING.md`, upgrade section: three SDK version examples - the current
+  pin (step 1, "pinned to the exact reviewed version"), and the "next" version
+  in step 1 (`Set the new version …`) and step 7 (`Built and tested against …`),
+  which become target + 1 minor.
 - Old `CHANGELOG.md` sections are history - never edit them.
+
+## Changes the snapshot doesn't show
+
+The snapshot tracks only access class and *required* parameters. New optional
+parameters, changed descriptions and response-model changes (often what the
+SDK changelog marks "BREAKING") are invisible to it. To see them, diff the two
+wheels (the venv has no pip, so use curl):
+
+```bash
+D=<scratchpad>/sdk; for v in <old> <new>; do
+  u=$(curl -s https://pypi.org/pypi/gcore/$v/json | python3 -c \
+    "import json,sys;print([f['url'] for f in json.load(sys.stdin)['urls'] if f['url'].endswith('.whl')][0])")
+  curl -s -o $D/$v.whl "$u"; mkdir -p $D/$v && unzip -qo $D/$v.whl -d $D/$v; done
+diff -r $D/<old>/gcore/resources/<area> $D/<new>/gcore/resources/<area>
+```
+
+Check the areas the SDK changelog mentions; put user-visible ones (new
+optional parameters, behaviour changes) under `### Changed` in the changelog.
+An SDK "BREAKING" change usually doesn't break this server (it passes
+arguments through by name) - say so when it doesn't.
 
 ## 7. Release metadata
 
