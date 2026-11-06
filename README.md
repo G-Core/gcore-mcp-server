@@ -286,9 +286,9 @@ usually a typo.
 | Instances and volumes as plain tools | `GCORE_MCP_MODE=direct GCORE_TOOLS='cloud.instances,cloud.volumes'` |
 
 > **Upgrading from an older version?** Named toolsets (`management`, `instances`,
-> …) are gone. If your `GCORE_TOOLS` matches no operation, the server logs a
-> warning, ignores it and runs in dynamic mode over the whole API. Replace toolset
-> names with SDK paths, or remove `GCORE_TOOLS`.
+> …) are gone. If your `GCORE_TOOLS` matches no operation, the server
+> logs an error and exits (code 2) instead of opening the whole API. Replace
+> toolset names with SDK paths, or remove `GCORE_TOOLS`.
 
 ## Safety
 
