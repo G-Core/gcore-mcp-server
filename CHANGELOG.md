@@ -13,6 +13,26 @@ Each release lists the gcore SDK version it was built and tested against.
 Every change to the server is released when it is merged, so there is no
 Unreleased section: the pull request adds its version's section at the top.
 
+## [1.2.0] - 2026-11-06
+
+Built and tested against gcore SDK 0.62.0.
+
+### Added
+
+- **`waap.analytics.get_detailed_events`** (read): WAAP security events with
+  each request's details (everything `get_request_details` returns except the
+  request headers), up to 1000 per page. Needs the `analytics_requests`
+  permission. 818 operations in total.
+
+### Changed
+
+- **Storage access keys can expire:** `storage.object_storages.access_keys.create`
+  takes an optional `expires_at` (at most 5 minutes ahead) for short-lived
+  keys, which are hidden from the key list.
+- **Storage usage statistics can be filtered by storage** with `storage_ids`.
+
+No operations were removed, renamed or reclassified.
+
 ## [1.1.0] - 2026-11-05
 
 Built and tested against gcore SDK 0.61.0, on Python 3.11 to 3.15.

@@ -1,7 +1,7 @@
 # Operations
 
-Every operation of the `gcore` Python SDK v0.61.0 that this server exposes:
-817 in total. Each one is named by its SDK path, which is also what
+Every operation of the `gcore` Python SDK v0.62.0 that this server exposes:
+818 in total. Each one is named by its SDK path, which is also what
 `GCORE_TOOLS` and `GCORE_DENY_TOOLS` patterns match (see the README, "Writing
 patterns").
 
@@ -770,11 +770,12 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `streaming.videos.subtitles.update` | write | Method to update subtitle of a video. |
 | `streaming.videos.update` | write | Changes parameters of the video to new values. |
 
-## waap (102)
+## waap (103)
 
 | operation | access | summary |
 |---|---|---|
 | `waap.advanced_rules.list` | read | Retrieve an advanced rules descriptor |
+| `waap.analytics.get_detailed_events` | read | Retrieves security events with the same filters, ordering and cursor pagination as [Get security events (V2)](#operation/`get_events_v2_analytics_events_get`). |
 | `waap.analytics.get_event_statistics` | read | Retrieves event statistics per given dimension of a request characteristics. |
 | `waap.analytics.get_events` | read | Retrieve security events over account's domains. |
 | `waap.analytics.get_filters` | read | Retrieves autocomplete suggestions for specified filter parameter values observed within the current client account during the requested time range. |
@@ -843,7 +844,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `waap.domains.settings.get` | read | Retrieve settings for a specific domain |
 | `waap.domains.settings.update` | write | Set various settings for a specific domain. |
 | `waap.domains.statistics.get_ddos_attacks` | read | Retrieve a domain's DDoS attacks |
-| `waap.domains.statistics.get_ddos_info` | read | Returns the top DDoS counts grouped by URL, User-Agent or IP |
+| `waap.domains.statistics.get_ddos_info` | read | Returns the top DDoS counts grouped by URL, User-Agent, IP, COUNTRY or JA4. |
 | `waap.domains.statistics.get_events_aggregated` | read | Retrieve an domain's event statistics |
 | `waap.domains.statistics.get_request_details` | read | Retrieves all the available information for a request that matches a given request id |
 | `waap.domains.update` | write | Update domain |
