@@ -4360,6 +4360,12 @@
   "access": "read",
   "required": []
  },
+ "waap.analytics.get_detailed_events": {
+  "access": "read",
+  "required": [
+   "start"
+  ]
+ },
  "waap.analytics.get_event_statistics": {
   "access": "read",
   "required": [

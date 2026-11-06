@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gcore-mcp-server"
-version = "1.1.0"
+version = "1.2.0"
 description = "MCP server for Gcore API"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,7 +13,7 @@ authors = [
 ]
 license = { text = "Apache-2.0" }
 dependencies = [
-    "gcore==0.61.0",  # exactly the reviewed SDK; upgrade with the catalog snapshot
+    "gcore==0.62.0",  # exactly the reviewed SDK; upgrade with the catalog snapshot
     "fastmcp>=4.0.2,<5",
     "pydantic-monty>=1.4,<2",
 ]
