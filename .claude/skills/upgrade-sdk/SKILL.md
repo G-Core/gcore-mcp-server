@@ -112,7 +112,7 @@ wheels (the venv has no pip, so use curl):
 D=<scratchpad>/sdk; for v in <old> <new>; do
   u=$(curl -s https://pypi.org/pypi/gcore/$v/json | python3 -c \
     "import json,sys;print([f['url'] for f in json.load(sys.stdin)['urls'] if f['url'].endswith('.whl')][0])")
-  curl -s -o $D/$v.whl "$u"; mkdir -p $D/$v && unzip -qo $D/$v.whl -d $D/$v; done
+  mkdir -p "$D/$v" && curl -fsS -o "$D/$v.whl" "$u" && unzip -qo "$D/$v.whl" -d "$D/$v"; done
 diff -r $D/<old>/gcore/resources/<area> $D/<new>/gcore/resources/<area>
 ```
 
