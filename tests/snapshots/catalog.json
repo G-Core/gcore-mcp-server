@@ -1516,6 +1516,12 @@
    "secret_name"
   ]
  },
+ "cloud.inference.secrets.delete_and_poll": {
+  "access": "destructive",
+  "required": [
+   "secret_name"
+  ]
+ },
  "cloud.inference.secrets.get": {
   "access": "read",
   "required": [
@@ -1724,6 +1730,18 @@
    "instance_id",
    "time_interval",
    "time_unit"
+  ]
+ },
+ "cloud.instances.rebuild": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
+  ]
+ },
+ "cloud.instances.rebuild_and_poll": {
+  "access": "destructive",
+  "required": [
+   "instance_id"
   ]
  },
  "cloud.instances.remove_from_placement_group": {
@@ -3604,6 +3622,10 @@
    "user_id"
   ]
  },
+ "iam.users.get_me": {
+  "access": "read",
+  "required": []
+ },
  "iam.users.invite": {
   "access": "write",
   "required": [
@@ -5014,6 +5036,14 @@
  "waap.organizations.list": {
   "access": "read",
   "required": []
+ },
+ "waap.prebilling.get_breakdown": {
+  "access": "read",
+  "required": [
+   "metric",
+   "from_",
+   "to"
+  ]
  },
  "waap.prebilling.get_total": {
   "access": "read",

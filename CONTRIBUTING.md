@@ -91,9 +91,9 @@ installed `gcore` SDK. An upgrade doesn't touch server code; you bump the versio
 and review what changed.
 
 1. **Bump the SDK.** The runtime dependency is pinned to the exact reviewed
-   version (`"gcore==0.62.0"`), so an install never picks up an SDK whose
+   version (`"gcore==0.63.0"`), so an install never picks up an SDK whose
    operations nobody has checked, not even a patch release. Set the new version in
-   `pyproject.toml` (`"gcore==0.63.0"`), then run:
+   `pyproject.toml` (`"gcore==0.64.0"`), then run:
    ```bash
    uv lock --upgrade-package gcore && uv sync --all-extras --dev
    ```
@@ -143,7 +143,7 @@ and review what changed.
 7. **Make it a release.** The upgrade changes `pyproject.toml`, so merging it
    releases a new version (see [Releasing](#releasing)): raise the minor version
    and add its `## [X.Y.Z] - YYYY-MM-DD` section to `CHANGELOG.md`, saying
-   "Built and tested against gcore SDK 0.63.0." and listing the operations that
+   "Built and tested against gcore SDK 0.64.0." and listing the operations that
    were added, removed or reclassified. `tests/test_versions.py` checks that the
    newest section names the pinned SDK.
 8. **Commit** `pyproject.toml`, `uv.lock`, `README.md` (the example tag),

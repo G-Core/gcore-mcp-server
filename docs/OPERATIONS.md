@@ -1,7 +1,7 @@
 # Operations
 
-Every operation of the `gcore` Python SDK v0.62.0 that this server exposes:
-818 in total. Each one is named by its SDK path, which is also what
+Every operation of the `gcore` Python SDK v0.63.0 that this server exposes:
+823 in total. Each one is named by its SDK path, which is also what
 `GCORE_TOOLS` and `GCORE_DENY_TOOLS` patterns match (see the README, "Writing
 patterns").
 
@@ -126,7 +126,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `cdn.trusted_ca_certificates.replace` | destructive | Change trusted CA certificate |
 | `cdn.update_account` | write | Change information about CDN service. |
 
-## cloud (410)
+## cloud (413)
 
 | operation | access | summary |
 |---|---|---|
@@ -272,6 +272,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `cloud.inference.registry_credentials.replace` | destructive | Replace inference registry credential |
 | `cloud.inference.secrets.create` | write | Create inference secret |
 | `cloud.inference.secrets.delete` | destructive | Delete Inference Secret |
+| `cloud.inference.secrets.delete_and_poll` | destructive | Delete an inference secret and poll until the API stops reporting it. |
 | `cloud.inference.secrets.get` | read | Get inference secret |
 | `cloud.inference.secrets.list` | read | List inference secrets |
 | `cloud.inference.secrets.replace` | destructive | Replace inference secret |
@@ -305,6 +306,8 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `cloud.instances.interfaces.list` | read | List all network interfaces attached to the specified instance. |
 | `cloud.instances.list` | read | List all instances in the specified project and region. |
 | `cloud.instances.metrics.list` | read | Get instance metrics, including cpu, memory, network and disk metrics |
+| `cloud.instances.rebuild` | destructive | Rebuild instance with a new image while preserving its configuration. |
+| `cloud.instances.rebuild_and_poll` | destructive | Rebuild the instance and poll for the result. |
 | `cloud.instances.remove_from_placement_group` | destructive | Remove an instance from its current placement group. |
 | `cloud.instances.remove_from_placement_group_and_poll` | destructive | Remove instance from the server group and poll for the result. |
 | `cloud.instances.resize` | destructive | Change flavor of the instance. |
@@ -616,7 +619,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `fastedge.templates.list` | read | Retrieve available application templates including system templates and user-created templates. |
 | `fastedge.templates.replace` | destructive | Modify an existing template's configuration. |
 
-## iam (10)
+## iam (11)
 
 | operation | access | summary |
 |---|---|---|
@@ -626,9 +629,10 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `iam.api_tokens.list` | read | Get information about your permanent API tokens in the account. |
 | `iam.get_account_overview` | read | Get information about your profile, users and other account details. |
 | `iam.users.delete` | destructive | Revokes user's access to the specified account. |
-| `iam.users.get` | read | Get user's details |
+| `iam.users.get` | read | Get a single user of the caller's own client. |
+| `iam.users.get_me` | read | The authenticated user's own profile, including the clients they belong to. |
 | `iam.users.invite` | write | Invite a user to the account. |
-| `iam.users.list` | read | Get a list of users. |
+| `iam.users.list` | read | List the users of the caller's own client. |
 | `iam.users.update` | write | This method updates user's details. |
 
 ## security (11)
@@ -770,7 +774,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `streaming.videos.subtitles.update` | write | Method to update subtitle of a video. |
 | `streaming.videos.update` | write | Changes parameters of the video to new values. |
 
-## waap (103)
+## waap (104)
 
 | operation | access | summary |
 |---|---|---|
@@ -874,6 +878,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `waap.ip_reputation.clear_local_tags` | destructive | Clear all tags associated between the provided IP addresses and domains. |
 | `waap.ip_reputation.list` | read | Retrieve a list of tags associated with the IP address grouped by domains. |
 | `waap.organizations.list` | read | This endpoint retrieves a list of network organizations that own IP ranges as identified by the Whois service.It supports pagination, filtering based on various parameters, and ordering of results. |
+| `waap.prebilling.get_breakdown` | read | Retrieve a report on the calling client's own billable consumption by given metric with per-account breakdown. |
 | `waap.prebilling.get_total` | read | Retrieve an aggregated report on the calling client's own billable consumption by given metric |
 | `waap.statistics.get_usage_series` | read | Retrieve statistics data as a time series. |
 | `waap.tags.list` | read | Tags are shortcuts for the rules used in WAAP policies for the creation of more complex WAAP rules |

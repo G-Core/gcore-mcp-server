@@ -518,7 +518,7 @@ server = [
 
 [[package]]
 name = "gcore"
-version = "0.62.0"
+version = "0.63.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -528,14 +528,14 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/05/3b76df4ee520afb46ea819c06ec0f3fbee857c485acd16dc46955942f0f9/gcore-0.62.0.tar.gz", hash = "sha256:eed317fe807c67943afff803b7445e40e91c7598cdf63fac00c17d1dc4b59cbf", size = 1216783, upload-time = "2026-11-06T15:59:25.18Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/89/237bc0f0670374b03b95cb55cc6113d895f4bdb4426e4bec2dc7f78e0251/gcore-0.63.0.tar.gz", hash = "sha256:6115d56fccfaf46c8669e4fd65a31495533383ad104d8109272a0b8bffb5053d", size = 1224213, upload-time = "2026-11-11T14:53:59.592Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/50/a029fd3175b31bb20a4038bb0e4252608fe3a5dda9323da853af225d1728/gcore-0.62.0-py3-none-any.whl", hash = "sha256:9eae858a23484ed2ee2772cead72409b8490ece890ebc0cb98e8c81236edee0c", size = 1762753, upload-time = "2026-11-06T15:59:23.357Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/cc/05d33c8df934f1133c944b4f937b0db8c6b428364db8fdb4ce2a005a94fc/gcore-0.63.0-py3-none-any.whl", hash = "sha256:1a14954377f2826b9f8138142625818912cb129de3a4ee82803f6e9f978017f1", size = 1771075, upload-time = "2026-11-11T14:53:58.178Z" },
 ]
 
 [[package]]
 name = "gcore-mcp-server"
-version = "1.2.0"
+version = "1.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
@@ -568,7 +568,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastmcp", specifier = ">=4.0.2,<5" },
-    { name = "gcore", specifier = "==0.62.0" },
+    { name = "gcore", specifier = "==0.63.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28.1" },
     { name = "pydantic-monty", specifier = ">=1.4,<2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
