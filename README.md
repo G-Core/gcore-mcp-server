@@ -181,7 +181,7 @@ budgets are enforced by `tests/test_protocol.py`.
 | `dynamic` **(default)** | 6 | 1,719 (1,203) | Almost always. Reaches all ~820 operations. |
 | `dynamic` with `GCORE_CODE_EXECUTION=false` | 5 | 1,374 (937) | If you don't want sandboxed code. |
 | `direct` | one per operation matched by `GCORE_TOOLS` | about 800 per tool | Classic one-tool-per-operation, for a known small set of operations. |
-| `direct`, `GCORE_TOOLS=*` | 818 | — (439,729) | Only for clients that defer tool loading (for example Claude Code Tool Search). |
+| `direct`, `GCORE_TOOLS=*` | 823 | — (442,232) | Only for clients that defer tool loading (for example Claude Code Tool Search). |
 
 **Dynamic mode** has these tools:
 
@@ -254,7 +254,7 @@ In dynamic mode, `GCORE_TOOLS` limits what search can reach.
 
 `GCORE_TOOLS` and `GCORE_DENY_TOOLS` take comma-separated patterns over operation
 names. An operation's name is its SDK path, such as `cloud.volumes.delete`. All
-818 are listed in [docs/OPERATIONS.md](docs/OPERATIONS.md), with their access class.
+823 are listed in [docs/OPERATIONS.md](docs/OPERATIONS.md), with their access class.
 
 - **A name without wildcards** matches that operation and everything below it:
   `dns.zones` covers `dns.zones.list`, `dns.zones.rrsets.delete` and so on.
@@ -426,7 +426,7 @@ uv tool install "gcore-mcp-server@git+https://github.com/G-Core/gcore-mcp-server
 ```
 
 These commands follow the `main` branch. To pin a release, add its tag to the URL,
-for example `…/gcore-mcp-server.git@v1.2.0`. Releases are listed on the
+for example `…/gcore-mcp-server.git@v1.3.0`. Releases are listed on the
 [releases page](https://github.com/G-Core/gcore-mcp-server/releases).
 
 ## Upgrading

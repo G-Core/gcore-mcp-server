@@ -13,6 +13,36 @@ Each release lists the gcore SDK version it was built and tested against.
 Every change to the server is released when it is merged, so there is no
 Unreleased section: the pull request adds its version's section at the top.
 
+## [1.3.0] - 2026-11-11
+
+Built and tested against gcore SDK 0.63.0.
+
+### Added
+
+- **`cloud.instances.rebuild`**, **`cloud.instances.rebuild_and_poll`**
+  (destructive): rebuild an instance from a new image (optionally with a new
+  SSH key and user data) while keeping its flavor, network and volumes. The
+  root disk is wiped.
+- **`cloud.inference.secrets.delete_and_poll`** (destructive): delete an
+  inference secret and wait until the API stops reporting it.
+- **`iam.users.get_me`** (read): the authenticated user's own profile and the
+  clients they belong to.
+- **`waap.prebilling.get_breakdown`** (read): the calling client's billable
+  WAAP consumption for a metric, broken down per account, paginated.
+
+823 operations in total (+5, none removed).
+
+### Changed
+
+- **`iam.users.get`, `list` and `update`** now use the IAM v2 API
+  (`/iam/v2/users`). `list` takes new optional filters (`ids`, `email`,
+  `name`, `created_at`, `auth_type`, `langs`) and `order_by`, and no longer
+  defaults `limit` to 50. `get` and `update` return the v2 user models.
+- **`cloud.tasks.list`** accepts the new task types for basic VMs
+  (`start_basic_vm`, `stop_basic_vm`, `soft_reboot_basic_vm`,
+  `hard_reboot_basic_vm`) and `rebuild_vm`.
+- **`waap.domains.list`**: the `name` filter also matches domain aliases.
+
 ## [1.2.0] - 2026-11-06
 
 Built and tested against gcore SDK 0.62.0.
