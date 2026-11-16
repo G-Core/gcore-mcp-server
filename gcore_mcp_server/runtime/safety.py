@@ -33,6 +33,7 @@ import logging
 import os
 import secrets
 import time
+import unicodedata
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Literal
@@ -404,6 +405,38 @@ def _modern_client_can_elicit(ctx: Any) -> bool:
 
 
 MAX_VALUE_CHARS = 500
+MAX_LABEL_CHARS = 80
+
+# Line and paragraph separators, control, format (bidi overrides, zero-width),
+# private-use and unassigned characters.
+_UNSAFE_CATEGORIES = frozenset({"Zl", "Zp", "Cc", "Cf", "Co", "Cs", "Cn"})
+
+
+def _escape(text: str) -> str:
+    """``text`` with every character that could break or restyle a prompt line
+    (newlines, terminal escapes, bidi overrides) written as a visible escape
+    such as ``\\n`` or ``\\x1b``, so a value can't pass for the server's own
+    text and a tampered one is visible."""
+    if text.isprintable():  # the common case: nothing to do
+        return text
+    return "".join(
+        ch.encode("unicode_escape").decode("ascii")
+        if unicodedata.category(ch) in _UNSAFE_CATEGORIES
+        else ch
+        for ch in text
+    )
+
+
+def clean_label(label: str) -> str:
+    """A resource's own name as a prompt shows it: escaped and capped.
+
+    Labels are read from the API, so whoever can rename the resource writes
+    them; the cap keeps one from filling the prompt.
+    """
+    text = _escape(label)
+    if len(text) > MAX_LABEL_CHARS:
+        text = f"{text[:MAX_LABEL_CHARS]}… ({len(text) - MAX_LABEL_CHARS} more chars)"
+    return text
 
 
 def _is_identifier(name: str) -> bool:
@@ -453,8 +486,10 @@ def describe_items(
     per item with its identifiers, never shortened, so the user can check
     exactly what is affected. Project and region are said once when every
     item shares them. Only very long other values (e.g. record contents) are
-    shortened, each with the number of characters left out.
+    shortened, each with the number of characters left out. Labels and values
+    are escaped (see :func:`_escape`), so none can add or rewrite a line.
     """
+    labels = [clean_label(label) if label else None for label in labels]
     kind = "DESTRUCTIVE" if entry.access is Access.DESTRUCTIVE else "Change"
     lines = [f"{kind}: {entry.summary.rstrip('.')} ({entry.name})"]
     common = {
@@ -462,7 +497,9 @@ def describe_items(
         for k in SCOPE_ARGS
         if k in items[0] and all(item.get(k) == items[0][k] for item in items)
     }
-    where = ", ".join(f"{k.removesuffix('_id')} {v}" for k, v in common.items())
+    where = ", ".join(
+        f"{k.removesuffix('_id')} {_escape(str(v))}" for k, v in common.items()
+    )
     count = f"{len(items)} items" if len(items) > 1 else "1 item"
     names = [label for label in labels if label]
     head = f"{count}" + (f" in {where}" if where else "")
@@ -487,12 +524,12 @@ def _shown(arguments: dict[str, Any]) -> str:
         text = (
             value if isinstance(value, (str, int)) else json.dumps(value, default=str)
         )
-        text = str(text)
+        text = _escape(str(text))
         if not _is_identifier(key) and len(text) > MAX_VALUE_CHARS:
             text = (
                 f"{text[:MAX_VALUE_CHARS]}… ({len(text) - MAX_VALUE_CHARS} more chars)"
             )
-        parts.append(f"{key} {text}")
+        parts.append(f"{_escape(key)} {text}")
     return ", ".join(parts) or "(no arguments)"
 
 
