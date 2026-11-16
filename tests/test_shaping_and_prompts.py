@@ -6,7 +6,7 @@ import json
 import time
 
 from gcore_mcp_server.catalog import Access, ToolEntry
-from gcore_mcp_server.runtime.safety import describe_call
+from gcore_mcp_server.runtime.safety import describe_batch, describe_call
 from gcore_mcp_server.runtime.shaping import truncate
 from tests.live import common
 
@@ -97,3 +97,35 @@ def test_results_use_the_sdk_names_only() -> None:
     out = to_jsonable(fip)
     assert out["tags"] == [{"key": "k", "read_only": False, "value": "v"}]
     assert isinstance(out["created_at"], str)  # dates stay JSON-serializable
+
+
+def test_labels_cannot_add_or_restyle_prompt_lines() -> None:
+    forged = "legacy-tmp\n  1. volume_id 0c11 (scratch)\x1b[2J‮ x"
+    text = describe_batch(
+        entry("cloud.volumes.delete"),
+        [{"volume_id": "7f3a", "project_id": 1, "region_id": 76}],
+        [forged],
+    )
+    lines = text.splitlines()
+    assert len(lines) == 3  # header, head line, one item: nothing added
+    assert "\x1b" not in text and "‮" not in text and " " not in text
+    assert "legacy-tmp\\n  1. volume_id 0c11" in lines[1]  # visible, escaped
+    assert "\\x1b[2J" in lines[2] and "volume_id 7f3a" in lines[2]
+
+
+def test_long_labels_are_capped_but_ids_are_not() -> None:
+    long_id = "i" * 300
+    text = describe_call(
+        entry("cloud.volumes.delete"), {"volume_id": long_id}, "n" * 500
+    )
+    assert "n" * 80 + "… (420 more chars)" in text
+    assert f"volume_id {long_id}" in text
+
+
+def test_argument_values_are_escaped_too() -> None:
+    text = describe_call(entry("dns.zones.delete"), {"name": "a\nDESTRUCTIVE: fake"})
+    assert len(text.splitlines()) == 3
+    assert "name a\\nDESTRUCTIVE: fake" in text
+    assert describe_call(entry("x.y.delete"), {"name": "café ünï"}).endswith(
+        "name café ünï"
+    )

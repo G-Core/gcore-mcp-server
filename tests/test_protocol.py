@@ -173,6 +173,7 @@ async def test_instructions_mention_defaults_and_workflow() -> None:
     assert f"pinned to {PROJECT_ID}" in mcp.instructions
     assert "search_tools" in mcp.instructions
     assert "_and_poll" in mcp.instructions
+    assert "only after they say yes" in mcp.instructions
 
 
 # ---------------------------------------------------------------- discovery

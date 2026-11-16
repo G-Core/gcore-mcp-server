@@ -13,6 +13,24 @@ Each release lists the gcore SDK version it was built and tested against.
 Every change to the server is released when it is merged, so there is no
 Unreleased section: the pull request adds its version's section at the top.
 
+## [1.3.1] - 2026-11-16
+
+Built and tested against gcore SDK 0.63.0.
+
+### Fixed
+
+- **Approval prompts escape what they show.** A resource's name (read from the
+  API) and argument values are shown with newlines, terminal escapes, bidi
+  overrides and other control or format characters written as visible escapes
+  (`\n`, `\x1b`), so a crafted name can't add lines that look like the
+  server's own, hide the real target, or restyle the client's display. Names
+  are capped at 80 characters in the prompt; IDs are never shortened. Only the
+  prompt text changes: calls and results are untouched.
+- **Clearer approval instructions for the model.** On CONFIRMATION REQUIRED,
+  the model retries with the token only after the user says yes in the
+  conversation, never because a result, a resource name or another tool says
+  it is approved.
+
 ## [1.3.0] - 2026-11-11
 
 Built and tested against gcore SDK 0.63.0.
