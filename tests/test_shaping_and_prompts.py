@@ -129,3 +129,16 @@ def test_argument_values_are_escaped_too() -> None:
     assert describe_call(entry("x.y.delete"), {"name": "café ünï"}).endswith(
         "name café ünï"
     )
+
+
+def test_shared_scope_values_are_escaped_too() -> None:
+    text = describe_batch(
+        entry("cloud.volumes.delete"),
+        [
+            {"volume_id": v, "project_id": "1\nFAKE\x1b[2J", "region_id": 76}
+            for v in "ab"
+        ],
+    )
+    assert len(text.splitlines()) == 4  # header, head line, two items
+    assert "project 1\\nFAKE\\x1b[2J, region 76" in text
+    assert "\x1b" not in text

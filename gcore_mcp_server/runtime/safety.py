@@ -497,7 +497,9 @@ def describe_items(
         for k in SCOPE_ARGS
         if k in items[0] and all(item.get(k) == items[0][k] for item in items)
     }
-    where = ", ".join(f"{k.removesuffix('_id')} {v}" for k, v in common.items())
+    where = ", ".join(
+        f"{k.removesuffix('_id')} {_escape(str(v))}" for k, v in common.items()
+    )
     count = f"{len(items)} items" if len(items) > 1 else "1 item"
     names = [label for label in labels if label]
     head = f"{count}" + (f" in {where}" if where else "")
