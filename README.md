@@ -351,11 +351,12 @@ Cursor), it can read the key from the client's config file and call the Gcore AP
 directly. For a hard guarantee, give the server a key that can't do more than you
 allow: an API token for a user with a read-only role. Read operations can also
 return secrets, such as kubeconfigs, a Kubernetes cluster's CA key
-(`get_certificate`, enough to mint admin credentials), secrets and access keys. Hide those with
+(`get_certificate`, enough to mint admin credentials), secrets, access keys and remote console URLs
+(a console URL opens the server's console). Hide those with
 `GCORE_DENY_TOOLS` if their contents shouldn't reach the model, for example:
 
 ```bash
-GCORE_DENY_TOOLS='cloud.k8s.clusters.kubeconfig.*,cloud.k8s.clusters.get_certificate,*.secrets.*,*credentials*,*.access_keys.*,iam.api_tokens.*'
+GCORE_DENY_TOOLS='cloud.k8s.clusters.kubeconfig.*,cloud.k8s.clusters.get_certificate,*.secrets.*,*credentials*,*.access_keys.*,iam.api_tokens.*,*console*'
 ```
 
 Read operations are recognised by their method names. A test

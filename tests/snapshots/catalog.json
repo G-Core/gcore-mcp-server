@@ -695,7 +695,7 @@
   ]
  },
  "cloud.baremetal.servers.update": {
-  "access": "write",
+  "access": "destructive",
   "required": [
    "server_id"
   ]

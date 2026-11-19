@@ -87,6 +87,9 @@ OVERRIDES: Final[dict[str, Access]] = {
     # (which is deprecated in favour of this endpoint).
     "cloud.floating_ips.update": Access.DESTRUCTIVE,
     "cloud.floating_ips.update_and_poll": Access.DESTRUCTIVE,
+    # interfaces is the full list of ports: a port left out is detached, which
+    # cuts the server's network.
+    "cloud.baremetal.servers.update": Access.DESTRUCTIVE,
     # Drops cached copies only: the CDN fetches them from the origin again,
     # which is what a deploy needs. No data is lost, so it's a write.
     "cdn.cdn_resources.purge": Access.WRITE,

@@ -141,7 +141,7 @@ date. Regenerate it with `UPDATE_SNAPSHOTS=1 uv run pytest tests/test_catalog.py
 | `cloud.baremetal.servers.list` | read | List all bare metal servers in the specified project and region. |
 | `cloud.baremetal.servers.rebuild` | destructive | Rebuild a bare metal server with a new image while preserving its configuration. |
 | `cloud.baremetal.servers.rebuild_and_poll` | destructive | Rebuild a bare metal server and wait for it to be ready. Waits for the task to finish. |
-| `cloud.baremetal.servers.update` | write | Rename bare metal server or update tags |
+| `cloud.baremetal.servers.update` | destructive | Rename bare metal server or update tags |
 | `cloud.billing_reservations.list` | read | Get a list of billing reservations along with detailed information on resource configurations and associated pricing. |
 | `cloud.cost_reports.get_aggregated_monthly` | read | Retrieve a detailed cost report totals for a specified month, which includes both commit and pay-as-you-go (overcommit) prices. |
 | `cloud.cost_reports.get_breakdown` | read | Get daily costs for a given period, summed down to one dimension: region (default), project, resource type or flavor. |

@@ -7,6 +7,7 @@ import json
 import os
 import re
 from pathlib import Path
+from typing import Any
 
 import jsonschema
 import pytest
@@ -96,6 +97,35 @@ def test_project_and_region_filters_are_left_alone() -> None:
     }
 
 
+class _GlobalViewServers:
+    """Global view create: region_id is a body field, project_id a path parameter."""
+
+    _client: Any
+
+    def create(self, *, project_id: int | None = None, region_id: int) -> None:
+        self._client._get_cloud_project_id_path_param()
+
+    def create_and_poll(self, *, project_id: int | None = None, region_id: int) -> None:
+        self.create(project_id=project_id, region_id=region_id)
+
+    def upload_and_poll(self, *, region_id: int | None = None) -> None:
+        """No base method: the wrapper itself is read."""
+        _ = dict(region_id=region_id)
+
+
+def test_poll_wrappers_follow_their_base_method() -> None:
+    """A global view create must not fill region_id from the default region."""
+    servers = _GlobalViewServers()
+    name = "cloud.baremetal.servers"
+    assert scoped_path_params(servers.create, f"{name}.create") == {"project_id"}
+    assert scoped_path_params(servers.create_and_poll, f"{name}.create_and_poll") == {
+        "project_id"
+    }
+    assert scoped_path_params(servers.upload_and_poll, f"{name}.upload_and_poll") == {
+        "region_id"
+    }
+
+
 def test_argument_docs_reach_the_schema() -> None:
     entry = full_catalog().resolve("cloud.ssh_keys.create")
     assert entry is not None
@@ -127,6 +157,14 @@ def test_argument_docs_reach_the_schema() -> None:
         # port_id: null disconnects it, like the destructive unassign.
         ("cloud.floating_ips.update", Access.DESTRUCTIVE),
         ("cloud.floating_ips.update_and_poll", Access.DESTRUCTIVE),
+        # The full interface list detaches every port that it leaves out.
+        ("cloud.baremetal.servers.update", Access.DESTRUCTIVE),
+        ("cloud.baremetal.servers.update_and_poll", Access.DESTRUCTIVE),
+        ("cloud.baremetal.servers.action_and_poll", Access.DESTRUCTIVE),
+        ("cloud.baremetal.servers.delete_and_poll", Access.DESTRUCTIVE),
+        ("cloud.baremetal.servers.create_and_poll", Access.WRITE),
+        ("cloud.baremetal.servers.console.get", Access.READ),
+        ("cloud.baremetal.flavors.list", Access.READ),
         ("cloud.gpu_baremetal.clusters.apply_settings_and_poll", Access.DESTRUCTIVE),
         ("cloud.gpu_baremetal.clusters.servers.apply_settings", Access.DESTRUCTIVE),
         ("cloud.instances.delete", Access.DESTRUCTIVE),
@@ -145,6 +183,27 @@ def test_argument_docs_reach_the_schema() -> None:
 )
 def test_classification(name: str, expected: Access) -> None:
     assert classify(name) is expected
+
+
+def test_temporary_clients_are_not_exposed(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The SDK's temporary regional bare metal client is for Terraform only."""
+    import gcore_mcp_server.catalog.catalog as catalog_module
+    from gcore_mcp_server.catalog import Catalog
+
+    def method() -> None:
+        """Get a bare metal server."""
+
+    names = [
+        "cloud.baremetal.servers.get",
+        "cloud.baremetal.servers.console.get",
+        "cloud.baremetal_regional.servers.get",
+        "cloud.baremetal_regional.flavors.list",
+    ]
+    monkeypatch.setattr(
+        catalog_module, "iter_sdk_methods", lambda _client: ((n, method) for n in names)
+    )
+    catalog = Catalog.from_client(object())
+    assert [e.name for e in catalog.entries] == sorted(names[:2])
 
 
 def test_no_delete_is_classified_as_safe() -> None:

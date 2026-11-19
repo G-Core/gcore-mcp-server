@@ -33,6 +33,7 @@ from pydantic import Field, TypeAdapter
 from gcore_mcp_server.core.schema import normalize_sdk_type_for_mcp
 
 from . import uploads
+from .classify import POLL_SUFFIX
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,15 @@ def scoped_path_params(method: Callable[..., Any], full_name: str) -> frozenset[
     (``cloud.tasks.list``, ``cloud.audit_logs.list``) they are optional
     *filters* instead, where leaving them unset means "all".
     """
+    if full_name.endswith(POLL_SUFFIX):
+        # A wrapper also passes body fields on, such as the region_id of a
+        # global view create, so ask the base method when it exists.
+        base_name = full_name.removesuffix(POLL_SUFFIX)
+        base = getattr(
+            getattr(method, "__self__", None), base_name.rsplit(".", 1)[-1], None
+        )
+        if callable(base):
+            return scoped_path_params(base, base_name)
     try:
         src = inspect.getsource(method)
     except (OSError, TypeError):
