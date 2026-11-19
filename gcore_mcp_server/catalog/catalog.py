@@ -34,6 +34,10 @@ NULL_NOTE = "Results leave out null fields: a missing key means the value is nul
 EXCLUDED_SERVICES = frozenset({"qs", "timeout"})
 EXCLUDED_METHODS = frozenset({"with_options", "copy", "as_dict"})
 
+# Temporary SDK clients that keep old routes for the Terraform provider only. The
+# SDK removes them in a later release, so tools must use the replacement clients.
+TEMPORARY_CLIENTS = frozenset({"cloud.baremetal_regional"})
+
 
 @dataclass
 class ToolEntry:
@@ -242,6 +246,8 @@ class Catalog:
             service = full_name.split(".", 1)[0]
             leaf = full_name.rsplit(".", 1)[-1]
             if service in EXCLUDED_SERVICES or leaf in EXCLUDED_METHODS:
+                continue
+            if matches_any(full_name, TEMPORARY_CLIENTS):
                 continue
             if include and not matches_any(full_name, include):
                 continue
